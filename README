@@ -1,0 +1,136 @@
+$Id: README,v 1.2 2012/05/11 21:00:59 wenzel Exp $
+-------------------------------------------------------------------
+
+     =========================================================
+     CaTS: Calorimeter and Tracker Simulation
+     =========================================================
+
+
+CaTS is a flexible and extend-able framework (based on geant4 and ROOT) for the simulation of calorimeter
+and tracking detectors. To be able to simulate Dual Read out calorimeters it provides special sensitive detectors
+and Hit classes that register both the energy deposit and the number of Cerenkov photons produced by charged particles 
+above the Cerenkov threshold.
+CaTS also allows the detailed study of single Calorimeter cells by enabling the tracing of optical photons, 
+providing sensitive detectors that register optical photons and the gdml detector description allows to provide all 
+relevant optical properties (refraction Index, Absorption length, Scintillation Yield,
+Rayleigh scattering length, Surface properties (e.g. Reflectivity)....)
+
+The components of CaTS are:
+
+
+Detector Description:      described in gdml input file (e.g. crystalcal.gdml)
+(Geometry, Materials,
+ optical properties,
+ sensitive detector)
+
+Input modules:                
+
+    GPS
+    Particle Gun
+    HEPMC (Pythia)
+
+
+Physics Lists:                  choice of all Reference Physics Lists
+                                          optical physics processes (Cerenkov, Rayleigh,
+                                          Scintillation etc.) are added (talk to)  
+                
+Sensitive Detectors:        (+ corresponding Hit classes)        
+
+    TrackerSD(Hit)  
+    CalorimeterSD(Hit)
+    DRCalorimeterSD(Hit) (besides registering energy deposit counts produced Cerenkov photons)
+    StoppingCalorimeterSD (registers total energy of entering particle and kills the particle afterwards to avoid further tracking)
+    PhotonSD(Hit): sensitive detector that  registers optical photons.
+
+
+Output of Hits (persistency):      uses Root reflexion (gccxml) to automatically
+                                                      create dictionaries for all Hit classes
+                                                      to make the Hits persistent
+                                                      and stores the result in a ROOT file. 
+
+Analysis Module:                        allows the user to book and store histograms, ntuples etc.
+
+User Actions:                                             simple examples of user actions (EventAction,  RunAction, StackingAction,SteppingAction...) are provided
+
+The source code can be browsed here.
+http://cdcvs.fnal.gov/cgi-bin/public-cvs/cvsweb-public.cgi/CaTS/?cvsroot=ilcdet
+
+To check out the code do:
+
+bash
+export CVSROOT=ilcdetcvs@cdcvs.fnal.gov:/cvs/ilcdet
+export CVS_RSH=/usr/bin/ssh
+cvs co CaTS
+
+For write access set the CVSROOT variable to:
+csh:
+setenv CVSROOT ilcdetcvs@cdcvs.fnal.gov:/cvs/ilcdet
+
+setenv CVS_RSH /usr/bin/ssh
+
+bash:
+export CVSROOT=ilcdetcvs@cdcvs.fnal.gov:/cvs/ilcdet
+
+export CVS_RSH=/usr/bin/ssh
+
+Then to check out for example the CaTS module:
+
+cvs co CaTS
+
+For read access set the CVSROOT variable to:
+csh:
+setenv CVSROOT :pserver:anonymous@cdcvs.fnal.gov:/cvs/ilcdet
+
+bash:
+export CVSROOT=:pserver:anonymous@cdcvs.fnal.gov:/cvs/ilcdet
+
+Then login (ilcdet is the password) 
+
+cvs login
+
+ilcdet 
+cvs co CaTS
+
+
+
+                     GDML detector sensitivity
+                     -------------------------
+
+This example demonstrates the usage of the GDML auxiliary information for
+associating a sensitive detector to a volume.
+
+The detector construction consists of a call to GDMLProcessor which parses a
+GDML file and returns the pointer to the world volume. The user can also write
+her/his own GDML file and use it as the primary input format for her/his Geant4
+application.
+
+A simple GDML files is provided:
+- xml/crystalcal.gdml, example of a simple PbF2 dual read out calorimeter.
+
+
+ Building and running the example
+ --------------------------------
+  
+    Before buidling and/or running the example you need to set the
+  following environment variables:
+  cmake -DCMAKE_MODULE_PATH=/home/wenzel/geant4.9.5.p01/cmake/Modules \
+        -DGeant4_DIR=/home/wenzel/geant4.9.5.p01-install/lib/Geant4-9.5.1/ \
+         /home/wenzel/testCaTS/CaTS
+
+cmake --verbose -DCMAKE_BUILD_TYPE=Debug \
+      		-DCMAKE_MODULE_PATH=/home/wenzel/geant4.9.5.p01/cmake/Modules \
+		-DGeant4_DIR=/home/wenzel/geant4.9.5.p01-install/lib/Geant4-9.5.1/ \
+		/home/wenzel/testCaTS/CaTS
+
+
+  You need to have built the persistency/gdml plugin module by having
+  set G4LIB_BUILD_GDML variable in your environment.
+  It is also required you specify the path where the XercesC XML parser
+  package is installed in your system, through the variable XERCESCROOT.
+
+- Compile and link to generate the executable:
+ 	      % make
+
+- Execute the application.
+  o 
+ 	      % CaTS  gdml/crystalcal.gdml test.mac 

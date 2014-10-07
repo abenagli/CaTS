@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+<!--
+Scitillation properties are taken from:
+R. Mao, L.Zhang, R-Y Zhu,
+Optical and Scintillation Properties of Inorganic Scintllators in High Energy Physics
+ IEEE Transactions on Nuclear Science  55 No. 4 (2008) 2425-2431.
+-->
+
+
+   <define>
+      <variable name="i" value="0"/>
+      <variable name="j" value="0"/>
+      <variable name="k" value="0"/>
+      <constant name="num" value="100"/>
+      <constant name="cellsize" value="25"/>
+
+      <matrix name="RINDEX" coldim="2" values="      1.6*eV  2.15     
+                                               1.65*eV 2.15
+                                               1.7*eV  2.15
+                                               1.75*eV 2.15
+                                               1.8*eV  2.151
+                                               1.85*eV 2.151
+                                               1.9*eV  2.152
+                                               1.95*eV 2.154
+                                               2.0*eV  2.158
+                                               2.05*eV 2.166
+                                               2.1*eV  2.167
+                                               2.15*eV 2.168
+                                               2.2*eV  2.169
+                                               2.25*eV 2.17
+                                               2.3*eV  2.172
+                                               2.35*eV 2.185
+                                               2.4*eV  2.19
+                                               2.45*eV 2.2
+                                               2.5*eV  2.21
+                                               2.55*eV 2.23
+                                               2.6*eV  2.24
+                                               2.65*eV 2.246
+                                               2.7*eV  2.249
+                                               2.75*eV 2.25
+                                               2.8*eV  2.25
+                                               2.85*eV 2.251
+                                               2.9*eV  2.252
+                                               2.95*eV 2.26
+                                               3.0*eV  2.27
+                                               3.05*eV 2.285
+                                               3.1*eV  2.29
+                                               3.15*eV 2.32
+                                               3.2*eV  2.335
+                                               3.25*eV 2.35
+                                               3.3*eV  2.36
+                                               3.35*eV 2.373
+                                               3.4*eV  2.39
+                                               3.45*eV 2.4
+                                               3.5*eV  2.42
+                                               3.55*eV 2.44
+                                               3.6*eV  2.45
+                                               3.7*eV  2.48
+                                               3.8*eV  2.5
+                                               3.9*eV  2.58
+                                               4.0*eV  2.66"/>
+   </define>
+
+   <materials>
+      <material Z="1.0" name="AIR">
+         <D value="1e-24"/>
+         <atom value="1.00794"/>
+      </material>
+      <element name="Oxygen"   formula="O"  Z="8.">  <atom value="16.0"/>   </element>
+      <element name="Nitrogen" formula="N"  Z="7.">  <atom value="14.01"/>  </element>
+      <element name="Fluorine" formula="F"  Z="9.">  <atom value="18.9984032"/>  </element>
+      <element name="Lead"     formula="Pb" Z="82."> <atom value="207.20"/> </element>
+      <element name="Bismuth"  formula="Bi" Z="83."> <atom value="208.98040"/> </element>
+      <element name="Germanium"  formula="Ge" Z="32."> <atom value="72.63"/> </element>
+      <material name="Air">
+        <D value="1.290" unit="mg/cm3"/>
+        <fraction n="0.7" ref="Nitrogen"/>
+        <fraction n="0.3" ref="Oxygen"/>
+      </material>
+    <material name="BGO">
+        <property name="RINDEX" ref="RINDEX"/>
+        <D value="7.13" unit="g/cm3"/>
+        <composite n="4" ref="Bismuth"/>
+        <composite n="3" ref="Germanium"/>
+        <composite n="12" ref="Oxygen"/>
+      </material>             
+    </materials>
+
+   <solids>
+       <box name="WorldBox" lunit="mm" x="cellsize*num+100" y="cellsize*num+100" z="cellsize*num+100"/>
+      <box name="CalorimeterCell"  lunit="mm" x="cellsize" y="cellsize" z="cellsize"/>
+   </solids>
+
+   <structure>
+      <volume name="CalorimeterVolume">
+         <materialref ref="BGO"/>
+         <solidref ref="CalorimeterCell"/>
+         <auxiliary auxtype="SensDet" auxvalue="DRCalorimeter"/>
+         <auxiliary auxtype="Color" auxvalue="Red"/>
+      </volume>
+    
+      <volume name="TOP">
+         <materialref ref="AIR"/>
+         <solidref ref="WorldBox"/>
+         <loop for="i" from="0" to="num" step="1">
+         <loop for="j" from="0" to="num" step="1">
+         <loop for="k" from="0" to="num" step="1">
+            <physvol>
+               <volumeref ref="CalorimeterVolume"/>
+               <position name="posijk" x="cellsize*(i-num/2)" y="cellsize*(j-num/2)" z="cellsize*(k-num/2)"/>
+            </physvol>
+         </loop>
+         </loop>
+         </loop>
+      </volume>
+   </structure>
+
+   <setup version="1.0" name="Default">
+      <world ref="TOP"/>
+   </setup>
+
+</gdml>

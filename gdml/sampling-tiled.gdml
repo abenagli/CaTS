@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+
+
+   <define>
+      <variable name="row" value="0"/>
+      <variable name="column" value="0"/>
+      <variable name="layer" value="0"/>
+      <constant name="num" value="100"/>
+      <constant name="cellsize" value="10"/>
+      <constant name="nlayers" value="30"/>
+      <constant name="absthick" value="50"/>
+      <constant name="qthick" value="7"/>
+      <constant name="szthick" value="5"/>
+      <constant name="minigap" value="0"/>
+      <constant name="layertotal" value="absthick+qthick*2+szthick+minigap*4"/>
+      <matrix name="RINDEX" coldim="2" values="0.603887779*eV  1.52005
+          0.637221566*eV  1.52184
+          0.703895765*eV  1.52468
+          0.737342849*eV  1.52583
+          0.804360971*eV  1.52781
+          0.838184154*eV  1.52865
+          0.888266227*eV  1.52977
+          0.948616679*eV  1.5309
+          1.069566943*eV  1.53283
+          1.250597135*eV  1.53514
+          1.4892997*eV    1.53773
+          1.614377604*eV  1.53903
+          2.103923299*eV  1.54424
+          2.440633858*eV  1.54822
+          2.856778802*eV  1.55396
+          3.146807107*eV  1.55846
+          3.646594118*eV  1.56747
+          5.367281385*eV  1.61395
+          6.261828283*eV  1.65087"/>
+   </define>
+
+   <materials>
+      <material Z="1.0" name="AIR">
+         <D value="1e-24"/>
+         <atom value="1.00794"/>
+      </material>
+      <element name="Oxygen"   formula="O"  Z="8.">  <atom value="16.0"/>   </element>
+      <element name="Nitrogen" formula="N"  Z="7.">  <atom value="14.01"/>  </element>
+      <element name="Fluorine" formula="F"  Z="9.">  <atom value="18.9984032"/>  </element>
+      <element name="Lead"     formula="Pb" Z="82."> <atom value="207.20"/> </element>
+      <element name="Carbon"   formula="C"  Z="6.">  <atom value="12.01" unit="g/mole"/>  </element>
+      <element name="Hydrogen" formula="H"  Z="1.">  <atom value="1.01" unit="g/mole"/>  </element>
+      <element name="Copper"   formula="Cu" Z="29.">  <atom value="63.546" unit="g/mole"/>  </element>
+      <element name="Zinc"     formula="Zn" Z="30.">  <atom value="65.38" unit="g/mole"/>  </element>
+      <element name="Silicon"  formula="Si" Z="14.">  <atom value="28.0855" unit="g/mole"/>  </element>
+
+      <material name="Air">
+	<D value="1.290" unit="mg/cm3"/>
+	<fraction n="0.7" ref="Nitrogen"/>
+	<fraction n="0.3" ref="Oxygen"/>
+      </material>
+      <material name="Brass">
+	<D value="8.530" unit="g/cm3"/>
+	<fraction n="0.7" ref="Copper"/>
+	<fraction n="0.3" ref="Zinc"/>
+      </material>
+      <material name="Quartz">
+        <property name="RINDEX" ref="RINDEX"/>
+	<D value="2.634" unit="g/cm3"/>
+        <composite n="2" ref="Oxygen" />
+        <composite n="1" ref="Silicon" />
+      </material>
+      <material name="Scintillator">
+	<D value="1.032" unit="g/cm3"/>
+        <composite n="19" ref="Carbon" />
+        <composite n="21" ref="Hydrogen" />
+      </material>
+   </materials>
+
+   <solids>
+      <box name="WorldBox" lunit="mm" x="num*cellsize+20" y="num*cellsize+20" z="nlayers*layertotal+100"/>
+      <box name="AbsorberBox" lunit="mm" x="cellsize*num" y="cellsize*num" z="absthick"/>
+      <box name="QuartzBox"   lunit="mm" x="cellsize" y="cellsize" z="qthick"/>
+      <box name="ScintBox"    lunit="mm" x="cellsize" y="cellsize" z="szthick"/>
+   </solids>
+
+   <structure>
+      <volume name="AbsorberVol">
+         <materialref ref="Brass"/>
+         <solidref ref="AbsorberBox"/>
+      </volume>
+      <volume name="ScintVol">
+         <materialref ref="Scintillator"/>
+         <solidref ref="ScintBox"/>
+	 <auxiliary auxtype="SensDet" auxvalue="Calorimeter"/>
+      </volume>
+      <volume name="QuartzVol">
+         <materialref ref="Quartz"/>
+         <solidref ref="QuartzBox"/>
+	 <auxiliary auxtype="SensDet" auxvalue="DRCalorimeter"/>
+      </volume>
+      <volume name="TOP">
+         <materialref ref="AIR"/>
+         <solidref ref="WorldBox"/>
+         <loop for="layer" from="0" to="nlayers - 1" step="1">
+             <physvol>
+                 <volumeref ref="AbsorberVol"/>
+                 <position name="abspos" x="0" y="0" z="-layertotal*nlayers/2+layertotal*layer+absthick/2"/>
+             </physvol>
+             <loop for="row"    from="0" to="num - 1" step="1">
+                 <loop for="column" from="0" to="num - 1" step="1">
+                     <physvol>
+                         <volumeref ref="QuartzVol"/>
+                         <position name="posijk" x="(-(num-1)/2+row)*cellsize" y="(-(num-1)/2+column)*cellsize" z="-layertotal*nlayers/2+layertotal*layer+absthick+qthick/2+minigap"/>
+                     </physvol>
+                     <physvol>
+                         <volumeref ref="ScintVol"/>
+                         <position name="posijk2" x="(-(num-1)/2+row)*cellsize" y="(-(num-1)/2+column)*cellsize" z="-layertotal*nlayers/2+layertotal*layer+absthick+qthick+szthick/2+minigap*2"/>
+                     </physvol>
+                     <physvol>
+                         <volumeref ref="QuartzVol"/>
+                         <position name="posijk3" x="(-(num-1)/2+row)*cellsize" y="(-(num-1)/2+column)*cellsize" z="-layertotal*nlayers/2+layertotal*layer+absthick+qthick*3/2+szthick+minigap*3"/>
+                     </physvol>
+                 </loop>
+             </loop>
+         </loop>
+      </volume>
+   </structure>
+
+   <setup version="1.0" name="Default">
+      <world ref="TOP"/>
+   </setup>
+
+</gdml>

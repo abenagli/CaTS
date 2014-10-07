@@ -1,0 +1,57 @@
+/* ------------------------------------------------------------------------
+            |\___/|       
+            )     (    
+           =\     /=
+             )===(
+            /     \         CaTS: Calorimeter and Tracker Simulation
+            |     |         Author: Hans Wenzel (Fermilab)
+           /       \
+           \       /
+            \__  _/
+              ( (
+               ) )
+              (_(
+-------------------------------------------------------------------------*/
+#ifndef Classes_HH
+#define Classes_HH
+#include "G4VHit.hh"
+#include "CalorimeterHit.hh"
+#include "DRCalorimeterHit.hh"
+#include "DRTimeSliceHit.hh"
+#include "DRTSCalorimeterHit.hh"
+#include "products.hh"
+#include "Event.hh"
+#include "PhotonHit.hh"
+#include "RunHeader.hh"
+#include "TrackerHit.hh"
+
+DRTimeSliceHit tslh;
+products p;
+Event e;
+RunHeader rh;
+std::map<G4String, std::map<int, std::map<G4String, double> > > map1;
+std::map<G4String, products> mp;
+std::map<G4String, std::map<G4String, products> > pm;
+std::map<G4String, std::map<G4String, std::map<G4String, products> > > ppm;
+std::map<G4String, std::map<int, std::map<G4String, products> > > pmt;
+std::map<G4String, std::map<int, std::map<G4String, std::map<G4String, products> > > > ppmt;
+std::map<G4String, int > pmult;
+std::map<G4String, double> Emap; // Energy deposited by particle type
+std::map<G4String, std::map<G4String, double> > VEmap;
+std::map<G4String, std::map<G4String, int> > Vpmult;
+//std::map<G4String, double> ncerenmap; // Cerenkov photons by particle type
+std::vector<G4VHit*> vh;
+std::map<G4String, std::vector<CalorimeterHit*> > cmap;
+std::map<G4String, std::vector<DRCalorimeterHit*> > drmap;
+std::map<G4String, std::vector<DRTSCalorimeterHit*> > drtsmap;
+std::map<G4String, std::vector<G4VHit*> > hcmap; // map of Hit Collections
+std::map<G4String, std::vector<PhotonHit*> > pmap;
+std::map<G4String, std::vector<TrackerHit*> > tmap;
+std::vector<CalorimeterHit*> c;
+std::vector<DRCalorimeterHit*> d;
+std::vector<DRTimeSliceHit*> tslhvec;
+std::vector<DRTSCalorimeterHit*> drts;
+std::vector<PhotonHit*> b;
+std::vector<TrackerHit*> a;
+#undef __G4String
+#endif

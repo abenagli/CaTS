@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+
+
+   <define>
+      <variable name="i" value="0"/>
+      <variable name="j" value="0"/>
+      <variable name="k" value="0"/>
+      <constant name="num" value="50"/>
+      <constant name="scale" value="25"/>
+      <matrix name="RINDEX" coldim="2" values="1.56258 1.74822
+					       1.59515 1.74941
+					       1.63606 1.75
+					       1.67667 1.75178
+					       1.71167 1.75296"/>
+   </define>
+
+   <materials>
+      <material Z="1.0" name="AIR">
+         <D value="1e-24"/>
+         <atom value="1.00794"/>
+      </material>
+      <element name="Oxygen"   formula="O"  Z="8.">  <atom value="16.0"/>   </element>
+      <element name="Nitrogen" formula="N"  Z="7.">  <atom value="14.01"/>  </element>
+      <element name="Fluorine" formula="F"  Z="9.">  <atom value="18.9984032"/>  </element>
+      <element name="Lead"     formula="Pb" Z="82."> <atom value="207.20"/> </element>
+
+      <material name="Air">
+	<D value="1.290" unit="mg/cm3"/>
+	<fraction n="0.7" ref="Nitrogen"/>
+	<fraction n="0.3" ref="Oxygen"/>
+      </material>
+
+      <material name="PbF2">
+<!--
+	<property name="RINDEX" ref="RINDEX"/>
+--> 
+	<D value="7.77" unit="g/cm3"/>
+	<composite n="1" ref="Lead"/>
+	<composite n="2" ref="Fluorine"/>
+      </material>
+
+   </materials>
+
+   <solids>
+      <box name="WorldBox" lunit="mm" x="2000" y="2000" z="2000"/>
+      <box name="Crystal"  lunit="mm" x="25" y="25" z="25"/>
+      <box lunit="mm" name="Row" x="625" y="25" z="25"/>
+      <box lunit="mm" name="Plane" x="625" y="625" z="25"/>
+      <box lunit="mm" name="Cube" x="625" y="625" z="625"/>
+      <box lunit="mm" name="WorldBox" x="1000" y="1000" z="1000"/>
+   </solids>
+
+   <structure>
+      <volume name="lvCrystal">
+         <materialref ref="PbF2"/>
+         <solidref ref="Crystal"/>
+	 <auxiliary auxtype="SensDet" auxvalue="Calorimeter"/>
+	 <auxiliary auxtype="Color" auxvalue="Blue"/>
+      </volume>
+        <volume name="lvReplicax">
+      <materialref ref="AIR"/>
+      <solidref ref="Row"/>
+      <replicavol number="25">
+        <volumeref ref="lvCrystal"/>
+        <replicate_along_axis> 
+        <direction  x="1" />
+        <width value="25" unit="mm"/>
+        <offset value="0" unit="mm"/>
+      </replicate_along_axis>
+     </replicavol>      
+    </volume>
+   <volume name="lvReplicay">
+      <materialref ref="AIR"/>
+      <solidref ref="Plane"/>
+      <replicavol number="25">
+        <volumeref ref="lvReplicax"/>
+        <replicate_along_axis> 
+        <direction  y="1" />
+        <width value="25" unit="mm"/>
+        <offset value="0" unit="mm"/>
+      </replicate_along_axis>
+     </replicavol>      
+    </volume>
+  <volume name="lvReplicaz">
+      <materialref ref="AIR"/>
+      <solidref ref="Cube"/>
+      <replicavol number="25">
+        <volumeref ref="lvReplicay"/>
+        <replicate_along_axis> 
+        <direction  z="1" />
+        <width value="25" unit="mm"/>
+        <offset value="0" unit="mm"/>
+      </replicate_along_axis>
+     </replicavol>      
+    </volume>
+   <volume name="TOP">
+      <materialref ref="AIR"/>
+      <solidref ref="WorldBox"/>
+      <physvol name="lvReplica_phys">
+        <volumeref ref="lvReplicaz"/>
+      </physvol>
+    </volume>
+
+   </structure>
+
+   <setup version="1.0" name="Default">
+      <world ref="TOP"/>
+   </setup>
+
+</gdml>

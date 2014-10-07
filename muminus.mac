@@ -1,0 +1,9 @@
+/CaTS/Analysis/Filename muminus_2GeV_analysis.root
+/CaTS/RootIO/Filename muminus_2GeV_hits.root
+# Shoot along various directions
+/tracking/verbose 0
+/gun/direction 0. 0. 1.
+/gun/position 0 0  -130 cm
+/gun/particle mu-
+/gun/energy 2 GeV
+/run/beamOn 1

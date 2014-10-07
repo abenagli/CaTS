@@ -1,0 +1,1 @@
+cmake --verbose -DCMAKE_MODULE_PATH=/afs/cern.ch/sw/lcg/external/geant4/10.0.p01/share/cmake/Modules -DGeant4_DIR=/afs/cern.ch/sw/lcg/external/geant4/10.0.p01/x86_64-slc6-gcc47-opt/lib64/Geant4-10.0.1 -DCMAKE_INSTALL_PREFIX=../CaTS_install ../CaTS_source

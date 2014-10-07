@@ -1,0 +1,80 @@
+void cresp (){
+  const Int_t n1= 6;
+  Double_t Ein[n1]= {2.0,5.0,10.0,20.0,50.0,100.0};  
+  Double_t Einerr[n1]={0.001,0.001,0.001,0.001,0.001,0.001};
+  Double_t Evis_C[n1]={1.258,3.158,6.668,13.73,35.79,74.98};
+  Double_t Evisrms_C[n1]={0.032,0.045,0.063,0.08,0.16,0.27};
+  Double_t Evissig_C[n1]={0.6097,0.9828,1.475,2.103,3.894,6.871};
+  Double_t Evis_S[n1]={1.947,4.726,9.448,18.99,47.72,95.91};
+  Double_t Evisrms_S[n1]={0.01,0.011,0.021,0.03,0.04,0.06};
+  Double_t Evissig_S[n1]={0.2131,0.2607,0.3543,0.5203,1.093,1.594};
+  //
+  Double_t Evis_C_rel[n1];
+  Double_t Evisrms_C_rel[n1];
+  Double_t Evis_S_rel[n1];
+  Double_t Evisrms_S_rel[n1];
+  for (unsigned int i=0;i<n1;i++)
+    {
+        Evis_C_rel[i]=Evis_C[i]/Ein[i];
+	Evisrms_C_rel[i]=Evisrms_C[i]/Ein[i];
+	Evis_S_rel[i]=Evis_S[i]/Ein[i];
+	Evisrms_S_rel[i]=Evisrms_S[i]/Ein[i];
+    }
+  TCanvas *c = new TCanvas("c", "response", 200, 10, 1000, 800);
+  TGraphErrors *gr_ref = new TGraphErrors(n1,Ein,Ein,Einerr,Einerr);
+  gr_ref->SetLineColor(1);
+  gr_ref->SetLineWidth(1);
+  gr_ref->SetLineStyle(2);
+  gr_ref->SetMarkerColor(3);
+  gr_ref->SetMarkerStyle(1);
+  gr_ref->SetTitle("visible Energy");
+  gr_ref->SetName("visible Energy");
+  gr_ref->GetXaxis()->SetTitle("Ein [GeV]");
+  gr_ref->GetYaxis()->SetTitle("Evis. [GeV]");
+  gr_ref->Draw("ACP");
+  TGraphErrors *gr_C = new TGraphErrors(n1,Ein,Evis_C,Einerr,Evisrms_C);
+  gr_C->SetLineColor(3);
+  gr_C->SetLineWidth(1);
+  gr_C->SetMarkerColor(3);
+  gr_C->SetMarkerStyle(21);
+  gr_C->Draw("CP");
+  TGraphErrors *gr_S = new TGraphErrors(n1,Ein,Evis_S,Einerr,Evisrms_S);
+  gr_S->SetLineColor(4);
+  gr_S->SetLineWidth(1);
+  gr_S->SetMarkerColor(4);
+  gr_S->SetMarkerStyle(22);
+  gr_S->Draw("CP");
+  TLegend *legend = new TLegend(.6, .15, 0.85, .4);
+  legend->AddEntry(gr_ref, "reference");
+  legend->AddEntry(gr_C, "Cerenkov");
+  legend->AddEntry(gr_S, "Scintillation");
+  legend->Draw();
+
+  TCanvas *c2 = new TCanvas("c2", "relative response", 200, 10, 1000, 800);
+  TMultiGraph *mg = new TMultiGraph();
+  mg->SetMinimum(0.6);
+  mg->SetMaximum(1.0);
+  mg->SetTitle(";Ein [GeV];Evis/Ein");
+  c2->SetGrid();
+  TGraphErrors *gr_rel_C = new TGraphErrors(n1,Ein,Evis_C_rel,Einerr,Evisrms_C_rel);
+  gr_rel_C->SetLineColor(3);
+  gr_rel_C->SetLineWidth(1);
+  gr_rel_C->SetMarkerColor(3);
+  gr_rel_C->SetMarkerStyle(21);
+  gr_rel_C->SetTitle("Cerenkov");
+  mg->Add( gr_rel_C);
+  TGraphErrors *gr_rel_S = new TGraphErrors(n1,Ein,Evis_S_rel,Einerr,Evisrms_S_rel);
+  gr_rel_S->SetLineColor(4);
+  gr_rel_S->SetLineWidth(1);
+  gr_rel_S->SetMarkerColor(4);
+  gr_rel_S->SetMarkerStyle(22);
+  gr_rel_S->SetTitle("Scintillation");
+  mg->Add( gr_rel_S);
+  mg->Draw("apl");
+  TLegend *leg = c2->BuildLegend(.6, .5, 0.85, .7);
+  leg->Draw();
+  pave = new TPaveText(2,2.2,30,2.4);
+  pave->SetTextAlign(12);
+  pave->AddText("Material: PbWO, Physics List: FTFPBERT");
+  pave->Draw();
+}

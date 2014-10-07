@@ -1,0 +1,32 @@
+/CaTS/random/randomSeed 123456
+/CaTS/RootIO/Filename pi-_50GeV_hits.root
+/CaTS/Analysis/Filename pi-_50GeV_analysis.root
+# low time slices
+/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/TimeSliceLow 0.025 ns
+/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/TimeSliceLow 0.025 ns
+/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/MinTimeLow 0. ns
+/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/MinTimeLow 0. ns
+/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/MaxTimeLow 5. ns
+/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/MaxTimeLow 5. ns
+# medium time slices
+/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/TimeSliceMed 0.5 ns
+/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/TimeSliceMed 0.5 ns
+/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/MinTimeMed 0. ns
+/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/MinTimeMed 0. ns
+/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/MaxTimeMed 100. ns
+/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/MaxTimeMed 100. ns
+# high time slices
+/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/TimeSliceHig 50 ns
+/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/TimeSliceHig 50 ns
+/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/MinTimeHig 0. ns
+/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/MinTimeHig 0. ns
+/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/MaxTimeHig 5000. ns
+/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/MaxTimeHig 5000. ns
+# Shoot along various directions
+#/tracking/verbose 1
+/gun/direction 0. 0. 1.
+/gun/position 0. 0. 0. mm
+/gun/particle pi-
+/gun/energy 50 GeV
+/run/beamOn 100
+exit

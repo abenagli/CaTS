@@ -1,0 +1,45 @@
+<lcgdict>
+    <class name="G4VHit"/>
+    <class name="CalorimeterHit"/>
+    <class name="DRCalorimeterHit"/>
+    <class name="DRTimeSliceHit"/>
+    <class name="DRTSCalorimeterHit"/>
+    <class name="DRTSCalorimeterHit2"/>
+    <class name="TrackerHit"/>
+    <class name="products"/>
+    <class name="Event"/>
+    <class name="G4String"/>
+    <class name="G4ThreeVector"/>
+    <class name="PhotonHit"/>
+    <class name="RunHeader"/>
+    <class name="std::basic_string<char>" />
+    <class name="std::vector<G4String>"/>
+    <class name="std::vector<G4VHit*>"/>
+    <class name="std::vector<CalorimeterHit*>"/>
+    <class name="std::vector<DRCalorimeterHit*>"/>
+    <class name="std::vector<DRTSCalorimeterHit*>"/>
+    <class name="std::vector<DRTSCalorimeterHit2*>"/>
+    <class name="std::vector<PhotonHit*>"/>
+    <class name="std::vector<TrackerHit*>"/>
+    <class name="std::map<G4String, std::vector<G4VHit*> >"/>
+    <class name="std::map<G4String, std::vector<TrackerHit*> >"/> 
+    <class name="std::map<G4String, std::vector<CalorimeterHit*> >"/>
+    <class name="std::map<G4String, std::vector<DRTSCalorimeterHit*> >"/>
+    <class name="std::map<G4String, std::vector<DRTSCalorimeterHit2*> >"/>
+    <class name="std::map<G4String, std::vector<DRCalorimeterHit*> >"/>
+    <class name="std::map<G4String, std::vector<PhotonHit*> >"/>
+    <class name="std::map<G4String, G4int >"/> 
+    <class name="std::map<G4String, G4double>"/> 
+    <class name="std::map<G4String, products>"/> 
+    <class name="std::map<G4int, std::map<G4String, G4int> >"/>
+    <class name="std::map<G4int, std::map<G4String, G4double> >"/>
+    <class name="std::map<G4String, std::map<G4String, G4int> >"/>
+    <class name="std::map<G4String, std::map<G4String, G4double> >"/>
+    <class name="std::map<G4String, std::map<G4String, products> >"/>
+    <class name="std::map<G4String, std::map<G4String, std::map<G4String, products> > >"/>
+    <class name="std::map<G4String, std::map<G4int, std::map<G4String, G4int> > >"/>
+    <class name="std::map<G4String, std::map<G4int, std::map<G4String, G4double> > >"/>
+    <class name="std::map<G4int, std::map<G4String, std::map<G4String, products> > >"/>
+    <class name="std::map<G4String, std::map<G4int, std::map<G4String, std::map<G4String, products> > > >"/>
+</lcgdict>
+

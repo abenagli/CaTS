@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+    <define>
+        <variable name="i" value="0"/>
+        <constant name="num" value="2500"/>
+        <constant name="sheetsize" value="2500"/>
+        <constant name="thickness" value="1."/>
+        <matrix name="RINDEX" coldim="2" values="2.03291*eV 1.58
+					       2.07329*eV 1.58
+					       2.12313*eV 1.58
+					       2.155*eV   1.58
+					       2.20466*eV 1.58
+					       2.25223*eV 1.58
+					       2.30652*eV 1.58
+					       2.36837*eV 1.58
+					       2.43363*eV 1.58
+					       2.48095*eV 1.58
+					       2.54136*eV 1.58
+					       2.58717*eV 1.58
+					       2.65907*eV 1.58
+					       2.73508*eV 1.58
+					       2.80182*eV 1.58
+					       2.85761*eV 1.58
+					       2.93054*eV 1.58
+					       2.99162*eV 1.58
+					       3.04721*eV 1.58
+					       3.0799*eV  1.58
+					       3.1133*eV  1.58
+					       3.16479*eV 1.58
+					       3.20902*eV 1.58
+					       3.25449*eV 1.58
+					       3.30128*eV 1.58
+					       3.34944*eV 1.58
+					       3.39901*eV 1.58
+					       3.43974*eV 1.58
+					       3.49205*eV 1.58"/>
+    </define>
+
+    <materials>
+        <material Z="1.0" name="AIR">
+            <D value="1e-24"/>
+            <atom value="1.00794"/>
+        </material>
+        <element name="Oxygen"   formula="O"  Z="8.">  
+            <atom value="16.0"/>   
+        </element>
+        <element name="Nitrogen" formula="N"  Z="7.">  
+            <atom value="14.01"/>  
+        </element>
+        <element name="Fluorine" formula="F"  Z="9.">  
+            <atom value="18.9984032"/>  
+        </element>
+        <element name="Lead"     formula="Pb" Z="82."> 
+            <atom value="207.20"/> 
+        </element>
+        <element name="Hydrogen"     formula="H" Z="1."> 
+            <atom value="1.008"/> 
+        </element>
+        <element name="Carbon"     formula="C" Z="6."> 
+            <atom value="12.011"/> 
+        </element>
+        <material name="Air">
+            <D value="1.290" unit="mg/cm3"/>
+            <fraction n="0.7" ref="Nitrogen"/>
+            <fraction n="0.3" ref="Oxygen"/>
+        </material>
+        <material name="PbF2">
+            <property name="RINDEX" ref="RINDEX"/>
+            <D value="7.77" unit="g/cm3"/>
+            <composite n="1" ref="Lead"/>
+            <composite n="2" ref="Fluorine"/>
+        </material>
+        <material name="Polystyrene">
+            <D value="10." unit="g/cm3"/>
+            <composite n="8" ref="Carbon"/>
+            <composite n="8" ref="Hydrogen"/>
+        </material>
+    </materials>
+
+    <solids>
+        <box name="WorldBox" lunit="mm" x="sheetsize+100" y="sheetsize+100" z="thickness*num+100"/>
+        <box name="CalorimeterCell"  lunit="mm" x="sheetsize" y="sheetsize" z="thickness"/>
+    </solids>
+
+    <structure>
+        <volume name="CalorimeterVolume">
+            <materialref ref="Polystyrene"/>
+            <solidref ref="CalorimeterCell"/>
+            <auxiliary auxtype="SensDet" auxvalue="DRTSCalorimeter"/>
+            <auxiliary auxtype="Color" auxvalue="Red"/>
+        </volume>
+    
+        <volume name="TOP">
+            <materialref ref="AIR"/>
+            <solidref ref="WorldBox"/>
+            <loop for="i" from="0" to="num" step="1">
+                <physvol>
+                    <volumeref ref="CalorimeterVolume"/>
+                    <position name="posijk" x="0" y="0" z="(thickness)*(i-num/2)"/>
+                </physvol>
+            </loop>
+        </volume>
+    </structure>
+
+    <setup version="1.0" name="Default">
+        <world ref="TOP"/>
+    </setup>
+
+</gdml>
