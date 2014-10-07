@@ -1,3 +1,6 @@
+# Root files
+*.root*
+
 # Compiled Object files
 *.slo
 *.lo
