@@ -56,31 +56,30 @@ target_link_libraries(${name} ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} 
 add_executable(readHits readHits.cc )
 target_link_libraries(readHits ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
-add_executable(drawShower drawShower.cc )
-target_link_libraries(drawShower ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
+#add_executable(drawShower drawShower.cc )
+#target_link_libraries(drawShower ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
-add_executable(DumpHeader DumpHeader.cc )
-target_link_libraries(DumpHeader ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
+#add_executable(DumpHeader DumpHeader.cc )
+#target_link_libraries(DumpHeader ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
-add_executable(uniformity uniformity.cc )
-target_link_libraries(uniformity ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
+#add_executable(uniformity uniformity.cc )
+#target_link_libraries(uniformity ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
-add_executable(profile profile.cc )
-target_link_libraries(profile ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
+#add_executable(profile profile.cc )
+#target_link_libraries(profile ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
  
-add_executable(Calibration Calibration.cc )
-target_link_libraries(Calibration ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
+#add_executable(Calibration Calibration.cc )
+#target_link_libraries(Calibration ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
-add_executable(Hits Hits.cc )
-target_link_libraries(Hits ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
+#add_executable(Hits Hits.cc )
+#target_link_libraries(Hits ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
-add_executable(ialength ialength.cc )
-target_link_libraries(ialength ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
+#add_executable(ialength ialength.cc )
+#target_link_libraries(ialength ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
-add_executable(response response.cc )
-target_link_libraries(response ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
+#add_executable(response response.cc )
+#target_link_libraries(response ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
-install (TARGETS ${name} uniformity readHits drawShower DumpHeader profile Calibration Hits ialength response DESTINATION bin)
-install (TARGETS ${name} uniformity DumpHeader profile Calibration Hits ialength response DESTINATION bin)
-install (TARGETS ClassesDict DESTINATION lib)
+install (TARGETS ${name} readHits DESTINATION bin)
+install (TARGETS ${name} ClassesDict DESTINATION lib)
 install (FILES vis.mac pythia_event.data SimpleExtension.xsd DESTINATION bin)

@@ -43,8 +43,8 @@ PrimaryGeneratorAction::PrimaryGeneratorAction() {
     G4ParticleDefinition* particle = particleTable->FindParticle(particleName = "mu+");
     fParticleGun->SetParticleDefinition(particle);
     fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0., 0., 1.));
-    fParticleGun->SetParticleEnergy(10. * CLHEP::GeV);
-    fParticleGun->SetParticlePosition(G4ThreeVector(0. * CLHEP::cm, 0. * CLHEP::cm, -130. * CLHEP::cm));
+    fParticleGun->SetParticleEnergy(10.*CLHEP::GeV);
+    fParticleGun->SetParticlePosition(G4ThreeVector(0.*CLHEP::mm, 0.*CLHEP::mm, -1300.*CLHEP::mm));
     gentypeMap["particleGun"] = fParticleGun;
     gentypeMap["GPS"] = new G4GeneralParticleSource;
     //create a messenger for this class

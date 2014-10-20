@@ -12,13 +12,14 @@
                ) )
               (_(
 -------------------------------------------------------------------------*/
+#include "EventAction.hh"
+
 #include <vector>
 #include <map>
 #include <sstream>
 #include <utility>
 
 #include "G4RunManager.hh"
-#include "EventAction.hh"
 #include "G4Event.hh"
 #include "G4EventManager.hh"
 #include "G4TrajectoryContainer.hh"
@@ -60,11 +61,17 @@ EventAction* EventAction::GetInstance() {
     return instance;
 }
 
+
+
 EventAction::EventAction() {
-    if (instance == 0) {
-        CaTSEvt = new Event();
-    }
-    instance = this;
+  if (instance == 0) {
+    CaTSEvt = new Event();
+  }
+  
+  //create a messenger for this class                                                                                                                                                                                                      
+  eventMessenger = new EventActionMessenger(this);
+  
+  instance = this;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -75,23 +82,25 @@ EventAction::~EventAction() {
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void EventAction::BeginOfEventAction(const G4Event* evt) {
-#ifdef G4ANALYSIS_USE
-    Analysis* analysis = Analysis::getInstance();
-//    analysis->BeginOfEvent(evt->GetEventID());
-#endif  
+// #ifdef G4ANALYSIS_USE
+//     Analysis* analysis = Analysis::getInstance();
+//     analysis->BeginOfEvent(evt->GetEventID());
+// #endif
     CaTSEvt->SetEventNr(evt->GetEventID());
-    long seed = CLHEP::HepRandom::getTheSeed();
-    G4cout << "seed: " << seed << G4endl;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void EventAction::EndOfEventAction(const G4Event*evt)
 {
-  G4RunManager* runManager = G4RunManager::GetRunManager();
-  runManager -> rndmSaveThisEvent();
+  if( seedSave )
+  {
+    G4RunManager* runManager = G4RunManager::GetRunManager();
+    runManager -> rndmSaveThisEvent();
+  }
   
   evt->Print();
+  
 #ifdef G4ANALYSIS_USE
   Analysis* analysis = Analysis::getInstance();
 #endif
@@ -102,7 +111,9 @@ void EventAction::EndOfEventAction(const G4Event*evt)
 #else
   //      EventContainer->SetPi0Energy(0);
 #endif
-  std::map<G4String, std::vector<G4VHit* > >* hcmap = CaTSEvt->GetHCMap();
+  
+  /*
+  std::map<G4String, std::vector<G4VHit*> >* hcmap = CaTSEvt->GetHCMap();
   G4HCofThisEvent* HCE = evt->GetHCofThisEvent();
   std::vector<G4VHit*> hitsVector;
   //G4cout << "Number of collections:  " << HCE->GetNumberOfCollections()<<G4endl;
@@ -167,6 +178,7 @@ void EventAction::EndOfEventAction(const G4Event*evt)
       G4cout << "SD type: " << Classname << " unknown" << G4endl;
     }
   }
+  */
   
   //   G4cout << "Size of hcmap:  " << hcmap->size() << "  " << EventContainer->GetHCMap()->size() << G4endl;
   RootIO::GetInstance()->Write(CaTSEvt);

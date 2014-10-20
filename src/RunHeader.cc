@@ -34,7 +34,7 @@ void RunHeader::Print() {
   G4cout << "enable optics:          " << enableoptics << G4endl;
   G4cout << "enable scint.:          " << enablescint << G4endl;
   G4cout << "Particle name:          " << ParticleName << G4endl;
-  G4cout << "Particle Energy[GeV]:   " << ParticleEnergy / 1000. << G4endl;
+  G4cout << "Particle Energy[GeV]:   " << ParticleEnergy << G4endl;
   G4cout << "Particle Time:          " << ParticleTime << G4endl;
   G4cout << "Particle Position:      " << ParticlePosition << G4endl;
   G4cout << "Particle Momentum:      " << ParticleMomentum << G4endl;

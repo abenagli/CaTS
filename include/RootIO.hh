@@ -27,32 +27,34 @@
 
 class RootIOMessenger;
 
-class RootIO {
+
+
+class RootIO
+{
 public:
-    virtual ~RootIO();
-
-    static RootIO* GetInstance();
-    void SetFileName(G4String);
-    void BeginOfRun();
-    void Write(Event*);
-    void Write(RunHeader*);
-    void Close();
-
+  virtual ~RootIO();
+  
+  static RootIO* GetInstance();
+  void SetFileName(G4String);
+  void BeginOfRun();
+  void Write(Event*);
+  void Write(RunHeader*);
+  void Close();
+  
 protected:
-    RootIO();
-
+  RootIO();
+  
 private:
-    G4String FileName;
-    bool evtinitialized;
-    bool runinitialized;
-    bool treeinitialized;
-    TFile* fo;
-    TTree* ftree;
-    TTree* fhtree;
-    TBranch* frunbranch;
-    TBranch* fevtbranch;
-    Long64_t fnb;
-    RootIOMessenger* pMessenger; // pointer to the Messenger
-
+  G4String FileName;
+  bool evtTreeInitialized;
+  bool runTreeInitialized;
+  bool evtInitialized;
+  bool runInitialized;
+  TFile* fo;
+  TTree* fevttree;
+  TTree* fruntree;
+  TBranch* fevtbranch;
+  TBranch* frunbranch;
+  RootIOMessenger* pMessenger; // pointer to the Messenger
 };
 #endif // INCLUDE_ROOTIO_HH

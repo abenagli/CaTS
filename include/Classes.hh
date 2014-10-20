@@ -24,39 +24,51 @@
 #include "RunHeader.hh"
 #include "TrackerHit.hh"
 
-#include "TH1F.h"
-
-DRTimeSliceHit tslh;
-products p;
 Event e;
 RunHeader rh;
-std::map<G4String, G4int > pmult;
-std::map<G4String, G4double> Emap; // Energy deposited by particle type
-std::map<G4String, std::map<G4String, G4int> > Vpmult;
-std::map<G4String, std::map<G4String, G4double> > VEmap;
-std::map<G4int, std::map<G4String, G4int> > Vpmultt;
-std::map<G4int, std::map<G4String, G4double> > VEmapt;
-std::map<G4String, std::map<G4int, std::map<G4String, G4int> > > Vpmultt2;
-std::map<G4String, std::map<G4int, std::map<G4String, G4double> > > VEmapt2;
-std::map<G4String, std::vector<CalorimeterHit*> > cmap;
-std::map<G4String, std::vector<DRCalorimeterHit*> > drmap;
-std::map<G4String, std::vector<DRTSCalorimeterHit*> > drtsmap;
-std::map<G4String, std::vector<DRTSCalorimeterHit2*> > drts2map;
-std::map<G4String, std::vector<G4VHit*> > hcmap; // map of Hit Collections
-std::map<G4String, std::vector<PhotonHit*> > pmap;
-std::map<G4String, std::vector<TrackerHit*> > tmap;
-std::vector<G4String> vs;
+products p;
+G4VHit h;
+DRTSCalorimeterHit2* drtsch;
+
+// energy by detector
+std::map<G4String,G4float> sfMap;
+// energy by detector and time
+std::map<G4int,G4float> ifMap;
+std::map<G4String,std::map<G4int,G4float> > sifMap;
+std::map<G4String,std::map<G4String,std::map<G4int,G4float> > > ssifMap;
+
+// energy by detector and particle
+std::map<G4String,std::map<G4String,G4float> > ssfMap;
+// energy by detector and particle and time
+std::map<G4int,std::map<G4String,G4float> > isfMap;
+std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > sisfMap;
+std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > > ssisfMap;
+
+// process multiplicity
+std::map<G4String,G4int> siMap;
+std::map<G4String,std::map<G4String,G4int> > ssiMap;
+// process multiplicity and time
+std::map<G4int,std::map<G4String,G4int> > isiMap;
+std::map<G4String,std::map<G4int,std::map<G4String,G4int> > > sisiMap;
+std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4int> > > > ssisiMap;
+
+// processes
+std::map<G4String,products> sp;
+std::map<G4String,std::map<G4String,products> > ssp;
+std::map<G4String,std::map<G4String,std::map<G4String,products> > > sssp;
+// processes and time
+std::map<G4int,std::map<G4String,std::map<G4String,products> > > issp;
+std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4String,products> > > > sissp;
+std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4String,products> > > > > ssissp;
+
+// hits
 std::vector<G4VHit*> vh;
-std::vector<CalorimeterHit*> c;
-std::vector<DRCalorimeterHit*> d;
-std::vector<DRTimeSliceHit*> tslhvec;
-std::vector<DRTSCalorimeterHit*> drts;
-std::vector<DRTSCalorimeterHit2*> drts2;
-std::vector<PhotonHit*> b;
-std::vector<TrackerHit*> a;
-std::map<G4String, products> mp;
-std::map<G4String, std::map<G4String, products> > pm;
-std::map<G4String, std::map<G4String, std::map<G4String, products> > >ppm;
-std::map<G4int, std::map<G4String, std::map<G4String, products> > > pmt;
-std::map<G4String, std::map<G4int, std::map<G4String, std::map<G4String, products> > > > ppmt;
+std::map<G4ThreeVector,std::vector<G4VHit*> > vvh;
+std::map<G4String,std::map<G4ThreeVector,std::vector<G4VHit*> > > svvh;
+std::map<G4String,std::map<G4String,std::map<G4ThreeVector,std::vector<G4VHit*> > > > ssvvh;
+std::vector<DRTSCalorimeterHit2*> vdrtsch;
+std::map<G4ThreeVector,std::vector<DRTSCalorimeterHit2*> > vvdrtsch;
+std::map<G4String,std::map<G4ThreeVector,std::vector<DRTSCalorimeterHit2*> > > svvdrtsch;
+std::map<G4String,std::map<G4String,std::map<G4ThreeVector,std::vector<DRTSCalorimeterHit2*> > > > ssvvdrtsch;
+
 #undef __G4String

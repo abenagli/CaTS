@@ -160,7 +160,7 @@ void StackingAction::FillHistos(const G4Track * aTrack) {
     //
     if (aTrack->GetDefinition()->GetParticleName() == "neutron") {
         ENeutronhisto->Fill(aTrack->GetKineticEnergy());
-        G4String CrProcess = aTrack->GetCreatorProcess()->GetProcessName();
+        CrProcess = aTrack->GetCreatorProcess()->GetProcessName();
         VolumeDirset[VolumeName]->cd();
         if (ENeutronhistosbyproc.find(VolumeName) == ENeutronhistosbyproc.end()) {
             std::map<G4String, TH1F*> tmpmap;
@@ -200,7 +200,7 @@ void StackingAction::FillHistos(const G4Track * aTrack) {
         if(pname=="proton"){
 
         EProtonhisto->Fill(aTrack->GetKineticEnergy());
-        G4String CrProcess = aTrack->GetCreatorProcess()->GetProcessName();
+        CrProcess = aTrack->GetCreatorProcess()->GetProcessName();
         VolumeDirset[VolumeName]->cd();
         if (EProtonhistosbyproc.find(VolumeName) == EProtonhistosbyproc.end()) {
             std::map<G4String, TH1F*> tmpmap;
@@ -224,7 +224,7 @@ void StackingAction::FillHistos(const G4Track * aTrack) {
         
         if(pname="p_ev"){
         EP_ev_protonhisto->Fill(aTrack->GetKineticEnergy());  
-        G4String CrProcess = aTrack->GetCreatorProcess()->GetProcessName();
+        CrProcess = aTrack->GetCreatorProcess()->GetProcessName();
         VolumeDirset[VolumeName]->cd();
         if (EP_ev_protonhistosbyproc.find(VolumeName) == EP_ev_protonhistosbyproc.end()) {
             std::map<G4String, TH1F*> tmpmap;
@@ -249,7 +249,7 @@ void StackingAction::FillHistos(const G4Track * aTrack) {
         if(pname="p_sp"){
         
         EP_sp_protonhisto->Fill(aTrack->GetKineticEnergy());
-        G4String CrProcess = aTrack->GetCreatorProcess()->GetProcessName();
+        CrProcess = aTrack->GetCreatorProcess()->GetProcessName();
         VolumeDirset[VolumeName]->cd();
         if (EP_sp_protonhistosbyproc.find(VolumeName) == EP_sp_protonhistosbyproc.end()) {
             std::map<G4String, TH1F*> tmpmap;
@@ -273,7 +273,7 @@ void StackingAction::FillHistos(const G4Track * aTrack) {
         
         if(pname="p_he"){
         EP_he_protonhisto->Fill(aTrack->GetKineticEnergy());
-        G4String CrProcess = aTrack->GetCreatorProcess()->GetProcessName();
+        CrProcess = aTrack->GetCreatorProcess()->GetProcessName();
         VolumeDirset[VolumeName]->cd();
         if (EP_he_protonhistosbyproc.find(VolumeName) == EP_he_protonhistosbyproc.end()) {
             std::map<G4String, TH1F*> tmpmap;
@@ -296,9 +296,8 @@ void StackingAction::FillHistos(const G4Track * aTrack) {
     }
     if (abs(charge) != 0.0) {
         G4double beta = aTrack->GetVelocity() / c_light;
-        G4double BetaInverse = 1. / beta;
-        G4String particleType = aTrack->GetDefinition()->GetParticleName();
-        G4String fragment = "Fragment";
+        particleType = aTrack->GetDefinition()->GetParticleName();
+        fragment = "Fragment";
         if (aTrack->GetParticleDefinition()->GetParticleType() == "nucleus" && aTrack->GetParticleDefinition()->GetParticleSubType() == "generic") {
             particleType = fragment;
         }
@@ -307,12 +306,12 @@ void StackingAction::FillHistos(const G4Track * aTrack) {
             std::map<G4String, TH1F*> tmpmap;
             BetaHistosbypart.insert(std::make_pair(VolumeName, tmpmap));
             const char* hisname = particleType.c_str();
-            TH1F *histo_beta = new TH1F(hisname, "beta of created particles", 100, 0, 1.);
+            histo_beta = new TH1F(hisname, "beta of created particles", 100, 0, 1.);
             BetaHistosbypart[VolumeName].insert(std::make_pair(particleType, histo_beta));
             BetaHistosbypart[VolumeName].at(particleType)->Fill(beta);
         } else if (BetaHistosbypart[VolumeName].find(particleType) == BetaHistosbypart[VolumeName].end()) {
             const char* hisname = particleType.c_str();
-            TH1F *histo_beta = new TH1F(hisname, "beta of created particles", 100, 0, 1.);
+            histo_beta = new TH1F(hisname, "beta of created particles", 100, 0, 1.);
             BetaHistosbypart[VolumeName].insert(std::make_pair(particleType, histo_beta));
             BetaHistosbypart[VolumeName].at(particleType)->Fill(beta);
         } else {

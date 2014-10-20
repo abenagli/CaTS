@@ -34,23 +34,22 @@ class G4HCofThisEvent;
 class Cerenkov;
 class DRTSCalorimeterSDMessenger;
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+G4String GetParticleName(G4Track* aTrack);
 
-class DRTSCalorimeterSD : public G4VSensitiveDetector {
 
+
+class DRTSCalorimeterSD : public G4VSensitiveDetector
+{
 private:
-  G4double birksc1;
-  G4double birksc2;
-  G4double timeslicelow;
-  G4double mintimelow;
-  G4double maxtimelow;
-  G4double timeslicemed;
-  G4double mintimemed;
-  G4double maxtimemed;
-  G4double timeslicehig;
-  G4double mintimehig;
-  G4double maxtimehig;
-
+  G4float birksc1;
+  G4float birksc2;
+  std::vector<G4String> timeSliceTypes;
+  std::map<G4String,G4float> timeSliceSizes;
+  std::map<G4String,G4float> minTimes;
+  std::map<G4String,G4float> maxTimes;
+  std::map<G4String,G4float> times;
+  
+  
 public:
   DRTSCalorimeterSD(G4String);
   ~DRTSCalorimeterSD();
@@ -58,93 +57,86 @@ public:
   void Initialize(G4HCofThisEvent*);
   G4bool ProcessHits(G4Step*, G4TouchableHistory*);
   
-  void SetBirksc1(G4double c1) {
+  void SetBirksc1(G4float c1) {
     birksc1 = c1;
   };
-  void SetBirksc2(G4double c2) {
+  void SetBirksc2(G4float c2) {
     birksc2 = c2;
   };
-  void SetTimeSliceLow(G4double tslice) {
-    timeslicelow = tslice;
+  void SetTimeSliceSizeLow(G4float tslice) {
+    timeSliceSizes["Low"] = tslice;
   };
-  void SetMinTimeLow(G4double time) {
-    mintimelow = time;
+  void SetMinTimeLow(G4float time) {
+    minTimes["Low"] = time;
   };
-  void SetMaxTimeLow(G4double time) {
-    maxtimelow = time;
+  void SetMaxTimeLow(G4float time) {
+    maxTimes["Low"] = time;
   };
-  void SetTimeSliceMed(G4double tslice) {
-    timeslicemed = tslice;
+  void SetTimeSliceSizeMed(G4float tslice) {
+    timeSliceSizes["Med"] = tslice;
   };
-  void SetMinTimeMed(G4double time) {
-    mintimemed = time;
+  void SetMinTimeMed(G4float time) {
+    minTimes["Med"] = time;
   };
-  void SetMaxTimeMed(G4double time) {
-    maxtimemed = time;
+  void SetMaxTimeMed(G4float time) {
+    maxTimes["Med"] = time;
   };
-  void SetTimeSliceHig(G4double tslice) {
-    timeslicehig = tslice;
+  void SetTimeSliceSizeHig(G4float tslice) {
+    timeSliceSizes["Hig"] = tslice;
   };
-  void SetMinTimeHig(G4double time) {
-    mintimehig = time;
+  void SetMinTimeHig(G4float time) {
+    minTimes["Hig"] = time;
   };
-  void SetMaxTimeHig(G4double time) {
-    maxtimehig = time;
+  void SetMaxTimeHig(G4float time) {
+    maxTimes["Hig"] = time;
   };
   
-  G4double GetBirksc1() {
+  G4float GetBirksc1() {
     return birksc1;
   };
-  G4double GetBirksc2() {
+  G4float GetBirksc2() {
     return birksc2;
   };
-  G4double GetTimeSliceLow() {
-    return timeslicelow;
+  G4float GetTimeSliceSizeLow() {
+    return timeSliceSizes["Low"];
   };
-  G4double GetMinTimeLow() {
-    return mintimelow;
+  G4float GetMinTimeLow() {
+    return minTimes["Low"];
   };
-  G4double GetMaxTimeLow() {
-    return maxtimelow;
+  G4float GetMaxTimeLow() {
+    return maxTimes["Low"];
   };
-  G4double GetTimeSliceMed() {
-    return timeslicemed;
+  G4float GetTimeSliceSizeMed() {
+    return timeSliceSizes["Med"];
   };
-  G4double GetMinTimeMed() {
-    return mintimemed;
+  G4float GetMinTimeMed() {
+    return minTimes["Med"];
   };
-  G4double GetMaxTimeMed() {
-    return maxtimemed;
+  G4float GetMaxTimeMed() {
+    return maxTimes["Med"];
   };
-  G4double GetTimeSliceHig() {
-    return timeslicehig;
+  G4float GetTimeSliceSizeHig() {
+    return timeSliceSizes["Hig"];
   };
-  G4double GetMinTimeHig() {
-    return mintimehig;
+  G4float GetMinTimeHig() {
+    return minTimes["Hig"];
   };
-  G4double GetMaxTimeHig() {
-    return maxtimehig;
+  G4float GetMaxTimeHig() {
+    return maxTimes["Hig"];
   };
   
   std::vector<G4String>* GetParticleList() { return particleList; };
-  std::vector<G4String>* GetParticleListCeren() { return particleListCeren; };
-  std::vector<G4String>* GetParticleListShort() { return particleListShort; };
   
   static DRTSCalorimeterSD* getInstance() { return instance; };
   
 private:
-  DRTSCalorimeterHitsCollection* drtscalorimeterCollection;
-  DRTSCalorimeterHits2Collection* drtscalorimeterCollection2;
-  G4int HCID;
+  static DRTSCalorimeterSD* instance;
   static EventAction* EvtAction;
   static RunHeader* RunHead;
   Cerenkov* CerenGenerator;
   DRTSCalorimeterSDMessenger* pMessenger;
-  std::vector<G4String>* particleList;
-  std::vector<G4String>* particleListCeren;
-  std::vector<G4String>* particleListShort;
   
-  static DRTSCalorimeterSD* instance;
+  std::vector<G4String>* particleList;
   
 #ifdef G4ANALYSIS_USE
     static Analysis* analysis;

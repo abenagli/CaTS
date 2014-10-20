@@ -24,8 +24,8 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 StackingActionMessenger::StackingActionMessenger(
-        StackingAction* CaTSAction)
-: CaTSAction(CaTSAction) {
+        StackingAction* act)
+: CaTSAction(act) {
     StackingActionDir = new G4UIdirectory("/CaTS/StackingAction/");
     StackingActionDir->SetGuidance("CaTS StackingAction control commands.");
 

@@ -1,27 +1,19 @@
 /CaTS/random/randomSeed JOB
+/CaTS/random/saveSeed false
 /CaTS/RootIO/Filename PARTICLE_ENERGYGeV_hits_JOB.root
 /CaTS/Analysis/Filename PARTICLE_ENERGYGeV_analysis_JOB.root
 # low time slices
-/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/TimeSliceLow 0.025 ns
-#/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/TimeSliceLow 0.025 ns
-/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/MinTimeLow 0. ns
-#/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/MinTimeLow 0. ns
-/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/MaxTimeLow 5. ns
-#/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/MaxTimeLow 5. ns
+/CaTS/SensitiveDetectors/TimeSliceSizeLow 0.025 ns
+/CaTS/SensitiveDetectors/MinTimeLow 0. ns
+/CaTS/SensitiveDetectors/MaxTimeLow 5. ns
 # medium time slices
-/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/TimeSliceMed 0.5 ns
-#/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/TimeSliceMed 0.5 ns
-/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/MinTimeMed 0. ns
-#/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/MinTimeMed 0. ns
-/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/MaxTimeMed 100. ns
-#/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/MaxTimeMed 100. ns
+/CaTS/SensitiveDetectors/TimeSliceSizeMed 0.5 ns
+/CaTS/SensitiveDetectors/MinTimeMed 0. ns
+/CaTS/SensitiveDetectors/MaxTimeMed 100. ns
 # high time slices
-/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/TimeSliceHig 50 ns
-#/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/TimeSliceHig 50 ns
-/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/MinTimeHig 0. ns
-#/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/MinTimeHig 0. ns
-/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/MaxTimeHig 5000. ns
-#/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/MaxTimeHig 5000. ns
+/CaTS/SensitiveDetectors/TimeSliceSizeHig 50 ns
+/CaTS/SensitiveDetectors/MinTimeHig 0. ns
+/CaTS/SensitiveDetectors/MaxTimeHig 5000. ns
 # Shoot along various directions
 #/tracking/verbose 1
 /gun/direction 0. 0. 1.

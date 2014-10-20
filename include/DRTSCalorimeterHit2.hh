@@ -33,15 +33,13 @@ private:
   G4double eobsbirks; //Birks supressed energy deposition
   G4int nceren; // nr of produced cerenkov photons
   G4ThreeVector pos; // position of calorimeter cell
-  G4int globalSliceLow; // time of first energy deposit
-  G4int globalSliceMed; // time of first energy deposit
-  G4int globalSliceHig; // time of first energy deposit
+  G4int timeSlice; // time of first energy deposit
   
 public:
   
   DRTSCalorimeterHit2();
   DRTSCalorimeterHit2(G4String pn, G4double de, G4double eobsb, G4int nc, G4ThreeVector p,
-                      G4int gsl, G4int gsm, G4int gsh);
+                      G4int ts);
   ~DRTSCalorimeterHit2();
   DRTSCalorimeterHit2(const DRTSCalorimeterHit2&);
   const DRTSCalorimeterHit2& operator=(const DRTSCalorimeterHit2&);
@@ -74,16 +72,8 @@ public:
     pos = xyz;
   };
   
-  inline void SetGlobalSliceLow(G4int gsl) {
-    globalSliceLow = gsl;
-  };
-  
-  inline void SetGlobalSliceMed(G4int gsm) {
-    globalSliceMed = gsm;
-  };
-  
-  inline void SetGlobalSliceHig(G4int gsh) {
-    globalSliceHig = gsh;
+  inline void SetTimeSlice(G4int ts) {
+    timeSlice = ts;
   };
   
   
@@ -107,16 +97,8 @@ public:
     return pos;
   };
   
-  inline G4int GetGlobalSliceLow() {
-    return globalSliceLow;
-  };
-  
-  inline G4int GetGlobalSliceMed() {
-    return globalSliceMed;
-  };
-  
-  inline G4int GetGlobalSliceHig() {
-    return globalSliceHig;
+  inline G4int GetTimeSlice() {
+    return timeSlice;
   };
   
 };

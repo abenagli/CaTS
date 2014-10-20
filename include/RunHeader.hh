@@ -46,13 +46,13 @@ private:
   std::vector<G4String> particleListCeren;
   std::vector<G4String> particleListShort;
   
-  G4double timeslicelow;
+  G4double timeslicesizelow;
   G4double mintimelow;
   G4double maxtimelow;
-  G4double timeslicemed;
+  G4double timeslicesizemed;
   G4double mintimemed;
   G4double maxtimemed;
-  G4double timeslicehig;
+  G4double timeslicesizehig;
   G4double mintimehig;
   G4double maxtimehig;
   
@@ -122,8 +122,8 @@ public:
     return particleListShort;
   }
   
-  G4double GetTimeSliceLow() {
-    return timeslicelow;
+  G4double GetTimeSliceSizeLow() {
+    return timeslicesizelow;
   };
   G4double GetMinTimeLow() {
     return mintimelow;
@@ -131,8 +131,8 @@ public:
   G4double GetMaxTimeLow() {
     return maxtimelow;
   };
-  G4double GetTimeSliceMed() {
-    return timeslicemed;
+  G4double GetTimeSliceSizeMed() {
+    return timeslicesizemed;
   };
   G4double GetMinTimeMed() {
     return mintimemed;
@@ -140,8 +140,8 @@ public:
   G4double GetMaxTimeMed() {
     return maxtimemed;
   };
-  G4double GetTimeSliceHig() {
-    return timeslicehig;
+  G4double GetTimeSliceSizeHig() {
+    return timeslicesizehig;
   };
   G4double GetMinTimeHig() {
     return mintimehig;
@@ -215,8 +215,8 @@ public:
       particleListShort.push_back(vec->at(it));
   }
   
-  void SetTimeSliceLow(G4double val) {
-    timeslicelow = val;
+  void SetTimeSliceSizeLow(G4double val) {
+    timeslicesizelow = val;
   }
   
   void SetMinTimeLow(G4double val) {
@@ -227,8 +227,8 @@ public:
     maxtimelow = val;
   }
   
-  void SetTimeSliceMed(G4double val) {
-    timeslicemed = val;
+  void SetTimeSliceSizeMed(G4double val) {
+    timeslicesizemed = val;
   }
   
   void SetMinTimeMed(G4double val) {
@@ -239,8 +239,8 @@ public:
     maxtimemed = val;
   }
   
-  void SetTimeSliceHig(G4double val) {
-    timeslicehig = val;
+  void SetTimeSliceSizeHig(G4double val) {
+    timeslicesizehig = val;
   }
   
   void SetMinTimeHig(G4double val) {

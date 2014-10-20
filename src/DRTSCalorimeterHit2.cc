@@ -29,15 +29,14 @@ DRTSCalorimeterHit2::DRTSCalorimeterHit2() {
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 DRTSCalorimeterHit2::DRTSCalorimeterHit2(G4String pn, G4double de, G4double eobsb, G4int nc, G4ThreeVector p,
-                                         G4int gsl, G4int gsm, G4int gsh) {
+                                         G4int ts)
+{
   particleName = pn;
   edep = de;
   eobsbirks = eobsb;
   nceren = nc;
   pos = p;
-  globalSliceLow = gsl;
-  globalSliceMed = gsm;
-  globalSliceHig = gsh;
+  timeSlice = ts;
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -54,9 +53,7 @@ DRTSCalorimeterHit2::DRTSCalorimeterHit2(const DRTSCalorimeterHit2& right):
   eobsbirks = right.eobsbirks;
   nceren = right.nceren;
   pos = right.pos;
-  globalSliceLow = right.globalSliceLow;
-  globalSliceMed = right.globalSliceMed;
-  globalSliceHig = right.globalSliceHig;
+  timeSlice = right.timeSlice;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -68,9 +65,7 @@ const DRTSCalorimeterHit2& DRTSCalorimeterHit2::operator=(const DRTSCalorimeterH
   eobsbirks = right.eobsbirks;
   nceren = right.nceren;
   pos = right.pos;
-  globalSliceLow = right.globalSliceLow;
-  globalSliceMed = right.globalSliceMed;
-  globalSliceHig = right.globalSliceHig;
+  timeSlice = right.timeSlice;
   
   return *this;
 }
@@ -110,11 +105,11 @@ void DRTSCalorimeterHit2::Draw()
 void DRTSCalorimeterHit2::Print()
 {
   G4cout << "   particle name: " << particleName
-         << "  energy deposit[MeV]: " << edep
-         << "  birks suppressed energy deposit[MeV]: " <<eobsbirks
+         << "  energy deposit[MeV]: " << edep/CLHEP::MeV
+         << "  birks suppressed energy deposit[MeV]: " <<eobsbirks/CLHEP::MeV
          << "  Nr of cerenkov Photons " << nceren
          << "  position[mm]: " << pos
-         << "  Global slice low of energy deposit: " << globalSliceLow
+         << "  Time slice of energy deposit: " << timeSlice
          << G4endl;
   G4cout << "================================================================" << G4endl;
 }

@@ -84,6 +84,7 @@ public:
       if( type == 0 ) return fDRGlobalTimeSliceHitCollection.size();
       if( type == 1 ) return fDRLocalTime1SliceHitCollection.size();
       if( type == 2 ) return fDRLocalTime2SliceHitCollection.size();
+      return -1;
     };
 
     inline void SetEdep(G4double de) {

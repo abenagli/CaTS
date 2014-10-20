@@ -23,8 +23,9 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-DRTSCalorimeterSDMessenger::DRTSCalorimeterSDMessenger(DRTSCalorimeterSD* pA) : pDRTSCalorimeterSD(pA) {
-  
+DRTSCalorimeterSDMessenger::DRTSCalorimeterSDMessenger(DRTSCalorimeterSD* pA):
+  pDRTSCalorimeterSD(pA)
+{
   G4String mess_directory = "/CaTS/SensitiveDetectors/" + pA->GetName()+"/";    
   AnalysisDir = new G4UIdirectory(mess_directory);
   AnalysisDir->SetGuidance("CaTS commands to control setting of sensitive Detectors.");
@@ -42,7 +43,10 @@ DRTSCalorimeterSDMessenger::DRTSCalorimeterSDMessenger(DRTSCalorimeterSD* pA) : 
   psetc2Cmd->SetDefaultValue(9.59e-6);
   psetc2Cmd->AvailableForStates(G4State_PreInit, G4State_Idle);
   
-  G4String c3dir = mess_directory + "TimeSliceLow";
+  
+  mess_directory = "/CaTS/SensitiveDetectors/";    
+  
+  G4String c3dir = mess_directory + "TimeSliceSizeLow";
   psetc3Cmd = new G4UIcmdWithADoubleAndUnit(c3dir, this);
   psetc3Cmd->SetGuidance("change size of the time slice bin");
   psetc3Cmd->SetParameterName("choice", false);
@@ -64,7 +68,7 @@ DRTSCalorimeterSDMessenger::DRTSCalorimeterSDMessenger(DRTSCalorimeterSD* pA) : 
   psetc3MaxCmd->SetUnitCategory("Time");
   psetc3MaxCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
   
-  G4String c4dir = mess_directory + "TimeSliceMed";
+  G4String c4dir = mess_directory + "TimeSliceSizeMed";
   psetc4Cmd = new G4UIcmdWithADoubleAndUnit(c4dir, this);
   psetc4Cmd->SetGuidance("change size of the time slice bin");
   psetc4Cmd->SetParameterName("choice", false);
@@ -86,7 +90,7 @@ DRTSCalorimeterSDMessenger::DRTSCalorimeterSDMessenger(DRTSCalorimeterSD* pA) : 
   psetc4MaxCmd->SetUnitCategory("Time");
   psetc4MaxCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
   
-  G4String c5dir = mess_directory + "TimeSliceHig";
+  G4String c5dir = mess_directory + "TimeSliceSizeHig";
   psetc5Cmd = new G4UIcmdWithADoubleAndUnit(c5dir, this);
   psetc5Cmd->SetGuidance("change size of the time slice bin");
   psetc5Cmd->SetParameterName("choice", false);
@@ -135,7 +139,7 @@ void DRTSCalorimeterSDMessenger::SetNewValue(G4UIcommand* command, G4String newV
     pDRTSCalorimeterSD->SetBirksc2(psetc1Cmd->GetNewDoubleValue(newValue));
   }
   else if (command == psetc3Cmd) {
-    pDRTSCalorimeterSD->SetTimeSliceLow(psetc3Cmd->GetNewDoubleValue(newValue));
+    pDRTSCalorimeterSD->SetTimeSliceSizeLow(psetc3Cmd->GetNewDoubleValue(newValue));
   }
   else if (command == psetc3MinCmd) {
     pDRTSCalorimeterSD->SetMinTimeLow(psetc3MinCmd->GetNewDoubleValue(newValue));
@@ -144,7 +148,7 @@ void DRTSCalorimeterSDMessenger::SetNewValue(G4UIcommand* command, G4String newV
     pDRTSCalorimeterSD->SetMaxTimeLow(psetc3MaxCmd->GetNewDoubleValue(newValue));
   }
   else if (command == psetc4Cmd) {
-    pDRTSCalorimeterSD->SetTimeSliceMed(psetc4Cmd->GetNewDoubleValue(newValue));
+    pDRTSCalorimeterSD->SetTimeSliceSizeMed(psetc4Cmd->GetNewDoubleValue(newValue));
   }
   else if (command == psetc4MinCmd) {
     pDRTSCalorimeterSD->SetMinTimeMed(psetc4MinCmd->GetNewDoubleValue(newValue));
@@ -153,7 +157,7 @@ void DRTSCalorimeterSDMessenger::SetNewValue(G4UIcommand* command, G4String newV
     pDRTSCalorimeterSD->SetMaxTimeMed(psetc4MaxCmd->GetNewDoubleValue(newValue));
   }  
   else if (command == psetc5Cmd) {
-    pDRTSCalorimeterSD->SetTimeSliceHig(psetc5Cmd->GetNewDoubleValue(newValue));
+    pDRTSCalorimeterSD->SetTimeSliceSizeHig(psetc5Cmd->GetNewDoubleValue(newValue));
   }
   else if (command == psetc5MinCmd) {
     pDRTSCalorimeterSD->SetMinTimeHig(psetc5MinCmd->GetNewDoubleValue(newValue));
@@ -174,7 +178,7 @@ G4String DRTSCalorimeterSDMessenger::GetCurrentValue(G4UIcommand* command) {
     cv = psetc2Cmd->ConvertToString(pDRTSCalorimeterSD->GetBirksc2());
   }
   else if (command == psetc3Cmd) {
-    cv = psetc3Cmd->ConvertToString(pDRTSCalorimeterSD->GetTimeSliceLow());
+    cv = psetc3Cmd->ConvertToString(pDRTSCalorimeterSD->GetTimeSliceSizeLow());
   }
   else if (command == psetc3MinCmd) {
     cv = psetc3MinCmd->ConvertToString(pDRTSCalorimeterSD->GetMinTimeLow());
@@ -183,7 +187,7 @@ G4String DRTSCalorimeterSDMessenger::GetCurrentValue(G4UIcommand* command) {
     cv = psetc3MaxCmd->ConvertToString(pDRTSCalorimeterSD->GetMaxTimeLow());
   }
   else if (command == psetc4Cmd) {
-    cv = psetc4Cmd->ConvertToString(pDRTSCalorimeterSD->GetTimeSliceMed());
+    cv = psetc4Cmd->ConvertToString(pDRTSCalorimeterSD->GetTimeSliceSizeMed());
   }
   else if (command == psetc4MinCmd) {
     cv = psetc4MinCmd->ConvertToString(pDRTSCalorimeterSD->GetMinTimeMed());
@@ -192,7 +196,7 @@ G4String DRTSCalorimeterSDMessenger::GetCurrentValue(G4UIcommand* command) {
     cv = psetc4MaxCmd->ConvertToString(pDRTSCalorimeterSD->GetMaxTimeMed());
   }
   else if (command == psetc5Cmd) {
-    cv = psetc5Cmd->ConvertToString(pDRTSCalorimeterSD->GetTimeSliceHig());
+    cv = psetc5Cmd->ConvertToString(pDRTSCalorimeterSD->GetTimeSliceSizeHig());
   }
   else if (command == psetc5MinCmd) {
     cv = psetc5MinCmd->ConvertToString(pDRTSCalorimeterSD->GetMinTimeHig());
@@ -204,5 +208,3 @@ G4String DRTSCalorimeterSDMessenger::GetCurrentValue(G4UIcommand* command) {
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-

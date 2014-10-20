@@ -12,32 +12,27 @@
                ) )
               (_(
 -------------------------------------------------------------------------*/
-#ifndef PrimaryGeneratorActionMessenger_h
-#define PrimaryGeneratorActionMessenger_h 1
+#ifndef EventActionMessenger_h
+#define EventActionMessenger_h 1
 
 #include "G4UImessenger.hh"
-#include "globals.hh"
+#include "G4UIcmdWithABool.hh"
 
-class PrimaryGeneratorAction;
-class G4UIdirectory;
-class G4UIcmdWithADoubleAndUnit;
-class G4UIcmdWithAnInteger;
-class G4UIcmdWithAString;
+class EventAction;
 
 
 
-class PrimaryGeneratorActionMessenger : public G4UImessenger
+class EventActionMessenger : public G4UImessenger
 {
 public:
-  PrimaryGeneratorActionMessenger(PrimaryGeneratorAction*);
-  ~PrimaryGeneratorActionMessenger();
+  EventActionMessenger(EventAction*);
+  ~EventActionMessenger();
   
   void SetNewValue(G4UIcommand*, G4String);
   
 private:
-  PrimaryGeneratorAction* CaTSAction;
-  G4UIcmdWithAString* genCmd;
-  G4UIcmdWithAnInteger* randomSeed;
+  EventAction* eventAction;
+  G4UIcmdWithABool* saveSeed;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -195,9 +195,9 @@ int main(int argc, char** argv)
       {
         DRTSCalorimeterHit2* aHit = dynamic_cast<DRTSCalorimeterHit2*>(hcVec2.at(vecIt));
         G4ThreeVector pos = aHit -> GetPos();
-        G4int globalSliceLow = aHit -> GetGlobalSliceLow();
-        G4int globalSliceMed = aHit -> GetGlobalSliceMed();
-        G4int globalSliceHig = aHit -> GetGlobalSliceHig();
+        G4int globalSliceLow = aHit -> GetTimeSlice();
+        G4int globalSliceMed = aHit -> GetTimeSlice();
+        G4int globalSliceHig = aHit -> GetTimeSlice();
         G4String partName = aHit -> GetParticleName();
         Edep = aHit -> GetEdep();
 
