@@ -51,6 +51,7 @@ using namespace std;
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
 std::vector<std::string> split(const std::string &s, char delim);
 bool FillChain(TChain* chain, const std::string& inputFileList);
+TH1F* GetCumulative(TProfile* prof, const bool& normalize);
 
 
 
@@ -97,8 +98,9 @@ int main(int argc, char** argv)
   FillChain(Trh,argv[1]);
   
   Event* event = new Event();
-  TBranch* b_event = Tevt -> GetBranch("Event");
-  b_event -> SetAddress(&event);
+  //TBranch* b_event = Tevt -> GetBranch("Event");
+  //b_event -> SetAddress(&event);
+  Tevt -> SetBranchAddress("Event",&event);
   
   RunHeader* runHeader = new RunHeader();
   TBranch* b_runHeader = Trh -> GetBranch("RunHeader");
@@ -150,7 +152,7 @@ int main(int argc, char** argv)
   //------------------
   // define histograms
   
-  std::map<G4String, TDirectory*> VolumeDirset;
+  std::map<G4String,TDirectory*> VolumeDirset;
   
   TDirectory* globalDir = outfile->mkdir("globalHistos");
   globalDir->cd();
@@ -209,15 +211,12 @@ int main(int argc, char** argv)
   // loop over events
   
   G4int nEvents = Tevt->GetEntries();
-  Tevt -> GetListOfBranches();
+  //nEvents = 10;
   G4cout << " Nr. of Events:  " << nEvents << " in input file "<< G4endl;
   for(G4int entry = 0; entry < nEvents; ++entry)
   {
     std::cout << ">>> processing event " << entry << " / " << nEvents << "\r" << std::flush;
-    
-    Long64_t localEntry = Tevt->LoadTree(entry);
-    b_event->GetEntry(localEntry);
-    
+    Tevt -> GetEntry(entry);
     
     // std::map<G4String, std::map<G4ThreeVector, std::vector<G4VHit*> > >* hcMap = event->GetHCMap();
     
@@ -256,11 +255,13 @@ int main(int argc, char** argv)
           {
             G4float time = min + (bin-1)*timeSliceSize + 0.5*timeSliceSize;
             Eobs_byTime[volName][timeSliceName] -> Fill( time,(*m_Eobs_byTime)[volName][timeSliceName][bin] );
+            Eobs_byTime["AllVol"][timeSliceName] -> Fill( time,(*m_Eobs_byTime)[volName][timeSliceName][bin] );
             
             for(unsigned int partIt = 0; partIt < particleList.size(); ++partIt)
             {
               std::string partName = particleList.at(partIt);
               Eobs_byParticleAndTime[volName][timeSliceName][partName] -> Fill( time,(*m_Eobs_byParticleAndTime)[volName][timeSliceName][bin][partName] );
+              Eobs_byParticleAndTime["AllVol"][timeSliceName][partName] -> Fill( time,(*m_Eobs_byParticleAndTime)[volName][timeSliceName][bin][partName] );
             }
           }
         }
@@ -1047,6 +1048,42 @@ int main(int argc, char** argv)
   G4cout << G4endl;
   G4cout << G4endl;
   
+  
+  
+  for(unsigned int volIt = 0; volIt < volumeList.size(); ++volIt)
+  {
+    std::string volName = volumeList.at(volIt);
+    
+    for(unsigned int timeTypeIt = 0; timeTypeIt < timeTypes.size(); ++timeTypeIt)
+    {
+      G4String timeType = timeTypes.at(timeTypeIt);
+      
+      for(unsigned int timeSliceTypeIt = 0; timeSliceTypeIt < timeSliceTypes.size(); ++timeSliceTypeIt)
+      {
+        G4String timeSliceType = timeSliceTypes.at(timeSliceTypeIt);
+        G4String timeSliceName = timeType+timeSliceType;
+        
+        VolumeDirset[volName] -> cd();
+        
+        TProfile* prof = (TProfile*)( gDirectory->Get(Form("Eobs%s_%s",volName.c_str(),timeSliceName.c_str())) );
+        GetCumulative(prof,false);
+        GetCumulative(prof,true);
+        
+        for(unsigned int partIt = 0; partIt < particleList.size(); ++partIt)
+        {
+          G4String partName = particleList.at(partIt);
+          
+          VolumeDirset[volName] -> cd("particleHistos");
+      
+          prof = (TProfile*)( gDirectory->Get(Form("Eobs%s_%s_%s",volName.c_str(),partName.c_str(),timeSliceName.c_str())) );
+          GetCumulative(prof,false);
+          GetCumulative(prof,true);
+        }
+      }
+    }
+  }
+  
+  
   G4cout << "===========================================" << G4endl;
   G4cout << " nr of bytes written:  " << outfile->Write() << G4endl;
   G4cout << "===========================================" << G4endl;
@@ -1094,4 +1131,29 @@ bool FillChain(TChain* chain, const std::string& inputFileList)
   }
   
   return true;
+}
+
+
+
+TH1F* GetCumulative(TProfile* prof, const bool& normalize)
+{
+  int nBinsX  = prof -> GetNbinsX();
+  double xMin = prof -> GetBinLowEdge(1);
+  double xMax = prof -> GetBinLowEdge(nBinsX) + prof -> GetBinWidth(nBinsX);
+  
+  TH1F* histo_cumul;
+  if( !normalize ) histo_cumul = new TH1F(Form("cumul%s",prof->GetName()),    "",nBinsX,xMin,xMax);
+  else             histo_cumul = new TH1F(Form("normCumul%s",prof->GetName()),"",nBinsX,xMin,xMax);
+  
+  prof -> ComputeIntegral();
+  double* integral = prof -> GetIntegral();
+  double norm = prof -> Integral();
+  
+  for(int bin = 1; bin <= nBinsX; ++bin)
+  {
+    if( !normalize ) histo_cumul -> SetBinContent(bin,integral[bin]*norm);
+    else             histo_cumul -> SetBinContent(bin,integral[bin]);
+  }
+  
+  return histo_cumul;
 }
