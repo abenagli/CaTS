@@ -48,6 +48,8 @@ set_target_properties(ClassesDict PROPERTIES ${ROOT_LIBRARY_PROPERTIES})
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
+SET(ROOT_LIBRARIES "${ROOT_LIBRARIES} -lGui")
+
 target_link_libraries(ClassesDict  ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex Reflex)
 
 add_executable(${name} ${name}.cc )
@@ -58,6 +60,9 @@ target_link_libraries(readHits ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES}
 
 #add_executable(drawShower drawShower.cc )
 #target_link_libraries(drawShower ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
+
+add_executable(drawShowerGUI drawShowerGUI.cc )
+target_link_libraries(drawShowerGUI ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
 #add_executable(DumpHeader DumpHeader.cc )
 #target_link_libraries(DumpHeader ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
@@ -80,6 +85,6 @@ target_link_libraries(readHits ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES}
 #add_executable(response response.cc )
 #target_link_libraries(response ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
-install (TARGETS ${name} readHits DESTINATION bin)
+install (TARGETS ${name} readHits drawShowerGUI DESTINATION bin)
 install (TARGETS ${name} ClassesDict DESTINATION lib)
 install (FILES vis.mac pythia_event.data SimpleExtension.xsd DESTINATION bin)

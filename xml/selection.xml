@@ -13,6 +13,8 @@
     <class name="std::vector<G4String>"/>
     <class name="std::vector<G4VHit*>"/>
     <class name="std::vector<DRTSCalorimeterHit2*>"/>
+    <class name="MyMainFrame"/>
+    <class name="GroupBox"/>
     <!-- energy by detector -->
     <class name="std::map<G4String,G4float>"/>
     <!-- energy by detector and time -->

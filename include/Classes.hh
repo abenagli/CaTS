@@ -23,12 +23,16 @@
 #include "PhotonHit.hh"
 #include "RunHeader.hh"
 #include "TrackerHit.hh"
+#include "MyMainFrame.hh"
 
 Event e;
 RunHeader rh;
 products p;
 G4VHit h;
 DRTSCalorimeterHit2* drtsch;
+
+MyMainFrame* mmf;
+GroupBox* gb;
 
 // energy by detector
 std::map<G4String,G4float> sfMap;
