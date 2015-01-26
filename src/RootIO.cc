@@ -108,6 +108,7 @@ void RootIO::Write(Event* fevent)
   {
     Int_t bufsize = 64000;
     fevtbranch = fevttree->Branch("Event", &fevent, bufsize, 2);
+    //fevttree -> SetBranchStatus("HCMap",0);
     fevtbranch->SetAutoDelete(kFALSE);
     evtInitialized = true;
   }

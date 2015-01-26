@@ -3,17 +3,17 @@
 /CaTS/RootIO/Filename PARTICLE_ENERGYGeV_hits_JOB.root
 /CaTS/Analysis/Filename PARTICLE_ENERGYGeV_analysis_JOB.root
 # low time slices
-/CaTS/SensitiveDetectors/TimeSliceSizeLow 0.025 ns
-/CaTS/SensitiveDetectors/MinTimeLow 0. ns
-/CaTS/SensitiveDetectors/MaxTimeLow 5. ns
+/CaTS/RunAction/TimeSliceSizeLow 0.010 ns
+/CaTS/RunAction/MinTimeLow 0. ns
+/CaTS/RunAction/MaxTimeLow 5. ns
 # medium time slices
-/CaTS/SensitiveDetectors/TimeSliceSizeMed 0.5 ns
-/CaTS/SensitiveDetectors/MinTimeMed 0. ns
-/CaTS/SensitiveDetectors/MaxTimeMed 100. ns
+/CaTS/RunAction/TimeSliceSizeMed 0.2 ns
+/CaTS/RunAction/MinTimeMed 0. ns
+/CaTS/RunAction/MaxTimeMed 100. ns
 # high time slices
-/CaTS/SensitiveDetectors/TimeSliceSizeHig 50 ns
-/CaTS/SensitiveDetectors/MinTimeHig 0. ns
-/CaTS/SensitiveDetectors/MaxTimeHig 5000. ns
+/CaTS/RunAction/TimeSliceSizeHig 10 ns
+/CaTS/RunAction/MinTimeHig 0. ns
+/CaTS/RunAction/MaxTimeHig 5000. ns
 # Shoot along various directions
 #/tracking/verbose 1
 /gun/direction 0. 0. 1.

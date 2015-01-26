@@ -37,8 +37,8 @@ $CURRENTDir = getcwd();
 $OUTPUTDir = $OUTPUTFolder."/".$OUTPUTLabel."/";
 if( $ISLxplus )
 {
-  print("cmsMkdir ".$OUTPUTDir."\n");
-  system("cmsMkdir ".$OUTPUTDir);
+  print("/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select mkdir -p /eos/cms/".$OUTPUTDir."\n");
+  system("/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select mkdir -p /eos/cms/".$OUTPUTDir."/");
 }
 
 $OUTPUTJobDir = "";
@@ -75,8 +75,8 @@ while(<LIST>)
   $STAGEOUTDir = $OUTPUTDir."/run_".$label;
   if( $ISLxplus )
   {
-    print("cmsMkdir ".$STAGEOUTDir."\n");
-    system("cmsMkdir ".$STAGEOUTDir);
+    print("/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select mkdir -p /eos/cms/".$STAGEOUTDir."/\n");
+    system("/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select mkdir -p /eos/cms/".$STAGEOUTDir."/");
   }
   
   
@@ -133,10 +133,10 @@ while(<LIST>)
     if( $ISLxplus )
     {
       print JOBSH "source /afs/cern.ch/sw/lcg/external/gcc/4.7/x86_64-slc6-gcc47-opt/setup.sh\n";
-      print JOBSH ". /afs/cern.ch/sw/lcg/external/geant4/10.0.p01/x86_64-slc6-gcc47-opt/CMake-setup.sh\n";
+      print JOBSH ". /afs/cern.ch/sw/lcg/external/geant4/10.0.p03/x86_64-slc6-gcc47-opt/CMake-setup.sh\n";
       print JOBSH "touch ".$jobDir."/job.run\n";
       print JOBSH "unbuffer ".$EXEName." ".$GDMLFile." ".$jobMacFile."\n";
-      print JOBSH "cmsStage -f ".$particle."_".$energy."GeV_hits_".$iJob.".root ".$STAGEOUTDir."\n";
+      print JOBSH "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select cp ".$particle."_".$energy."GeV_hits_".$iJob.".root /eos/cms/".$STAGEOUTDir."/\n";
       print JOBSH "touch ".$jobDir."/job.done\n";
     }
     

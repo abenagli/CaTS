@@ -161,8 +161,8 @@ int main(int argc, char **argv)
   
   
   runManager->SetUserInitialization(new DetectorConstruction(argv[1]));
-  runManager->SetUserAction(new PrimaryGeneratorAction);
   runManager->SetUserAction(new RunAction(argv[1], physName, enable_optical, enable_scint));
+  runManager->SetUserAction(new PrimaryGeneratorAction);
   EventAction *EvtAct = EventAction::GetInstance();
   runManager->SetUserAction(EvtAct);
   runManager->SetUserAction(new TrackingAction());

@@ -2,26 +2,6 @@
 
 
 
-GroupBox::GroupBox(const TGWindow* p, const char* name, const char* title) :
-  TGGroupFrame(p,name)
-{
-  // Group frame containing combobox and number entry
-  
-  TGHorizontalFrame* horz = new TGHorizontalFrame(this);
-  AddFrame(horz, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY));
-  TGLabel* label = new TGLabel(horz,title);
-  horz->AddFrame(label, new TGLayoutHints(kLHintsLeft | kLHintsCenterY));
-
-  fCombo = new TGComboBox(horz);
-  horz->AddFrame(fCombo, new TGLayoutHints(kLHintsRight | kLHintsExpandY, 5, 0, 5, 5));
-  fCombo->Resize(100, 20);
-
-  fEntry = new TGNumberEntry(this);
-  AddFrame(fEntry, new TGLayoutHints(kLHintsExpandX | kLHintsCenterY));
-}
-
-
-
 void MyMainFrame::DoSetEventId(char* val)
 {
   eventId = atoi(val);
@@ -56,6 +36,30 @@ void MyMainFrame::DoSetMaxTimeSlice(char* val)
 }
 
 
+void MyMainFrame::DoSetParticleEnabled(Bool_t val)
+{
+  TGCheckButton* btn = (TGCheckButton*)(gTQSender);
+  int id = btn->WidgetId();
+  
+  G4String particleName = particleList->at(id);
+  particleEnabled[particleName] = val;
+  if( val == false ) std::cout << ">>> Disabling " << particleName << std::endl;
+  if( val == true )  std::cout << ">>> Enabling "  << particleName << std::endl;
+}
+
+
+void MyMainFrame::DoSetProcessEnabled(Bool_t val)
+{
+  TGCheckButton* btn = (TGCheckButton*)(gTQSender);
+  int id = btn->WidgetId();
+  
+  G4String processName = processList->at(id);
+  processEnabled[processName] = val;
+  if( val == false ) std::cout << ">>> Disabling " << processName << std::endl;
+  if( val == true )  std::cout << ">>> Enabling "  << processName << std::endl;
+}
+
+
 void MyMainFrame::DoDraw()
 {
   std::cout << "Slot DoDraw()" << std::endl;
@@ -81,7 +85,6 @@ void MyMainFrame::DoDraw()
   std::cout << "ts: " << timeSliceString << "   " << timeSliceType << std::endl;
   
   std::map<G4String,std::map<G4String,std::map<G4ThreeVector,std::vector<G4VHit*> > > >* HCMap = event->GetHCMap();
-  std::map<G4ThreeVector,std::vector<G4VHit*> > posHitMap = (*HCMap)["AbsorberVol_DRTSCalorimeter"][timeSliceString];
   
   
   // Draw something in the canvas
@@ -96,37 +99,52 @@ void MyMainFrame::DoDraw()
   
   // Fill histograms
   if( h2_yx != NULL ) delete h2_yx;
-  h2_yx = new TH2F(Form("h2_yx"),"y-x view",20,-500.,500.,20.,-500.,500.);
+  h2_yx = new TH2F(Form("h2_yx"),"y-x view",nBinsY,yAxis,nBinsX,xAxis);
+  h2_yx -> SetTitle(";x (mm);y (mm);#LTE_{obs}#GT (GeV)");
+  h2_yx -> GetZaxis() -> SetTitleOffset(1.50);
   
   if( h2_yz != NULL ) delete h2_yz;  
-  h2_yz = new TH2F(Form("h2_yz"),"y-z view",200,0.,3000.,20.,-500.,500.);
-
-  for(std::map<G4ThreeVector,std::vector<G4VHit*> >::const_iterator mapIt = posHitMap.begin(); mapIt != posHitMap.end(); ++mapIt)
+  h2_yz = new TH2F(Form("h2_yz"),"y-z view",nBinsZ,zAxis,nBinsY,yAxis);
+  h2_yz -> SetTitle(";z (mm);y (mm);#LTE_{obs}#GT (GeV)");
+  h2_yz -> GetZaxis() -> SetTitleOffset(1.50);
+  
+  std::vector<G4String>* Volumes = runHeader -> GetVolumes();
+  for(unsigned int volIt = 0; volIt < Volumes->size(); ++volIt)
   {
-    double x = (mapIt->first).x();
-    double y = (mapIt->first).y();
-    double z = (mapIt->first).z();
-    std::vector<G4VHit*> hitVec = mapIt->second;
-    for(unsigned int vecIt = 0; vecIt < hitVec.size(); ++vecIt)
+    G4String volName = Volumes->at(volIt);
+    std::map<G4ThreeVector,std::vector<G4VHit*> > posHitMap = (*HCMap)[volName][timeSliceString];
+    for(std::map<G4ThreeVector,std::vector<G4VHit*> >::const_iterator mapIt = posHitMap.begin(); mapIt != posHitMap.end(); ++mapIt)
     {
-      DRTSCalorimeterHit2* aHit = dynamic_cast<DRTSCalorimeterHit2*>(hitVec.at(vecIt));
-      G4int timeSlice = aHit -> GetTimeSlice();
-      if( timeSlice >= minTimeSlice && timeSlice <= maxTimeSlice )
+      double x = (mapIt->first).x();
+      double y = (mapIt->first).y();
+      double z = (mapIt->first).z();
+      std::vector<G4VHit*> hitVec = mapIt->second;
+      for(unsigned int vecIt = 0; vecIt < hitVec.size(); ++vecIt)
       {
-        h2_yx -> Fill(x,y,aHit->GetEdep());
-        h2_yz -> Fill(z,y,aHit->GetEdep());
+        DRTSCalorimeterHit2* aHit = dynamic_cast<DRTSCalorimeterHit2*>(hitVec.at(vecIt));
+        G4int timeSlice = aHit -> GetTimeSlice();
+        G4String particleName = aHit -> GetParticleName();
+        G4String processName = aHit -> GetProcessName();
+        if( particleEnabled[particleName] == false ) continue;
+        if( processEnabled[processName] == false ) continue;
+        if( timeSlice >= minTimeSlice && timeSlice <= maxTimeSlice )
+        {
+          h2_yx -> Fill(x,y,aHit->GetEdep());
+          h2_yz -> Fill(z,y,aHit->GetEdep());
+        }
       }
     }
   }
   
-  
   // Draw histograms
   c1 -> cd(1);
   gPad -> SetLogz();
+  gPad->SetRightMargin(0.20);
   h2_yx -> Draw("COLZ");
   
   c1 -> cd(2);
   gPad -> SetLogz();
+  gPad->SetRightMargin(0.20);
   h2_yz -> Draw("COLZ");
   
   
@@ -188,13 +206,26 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h, TFile* f) :
   Tevt -> SetBranchAddress("Event",&event);
   Trh = (TTree*)(inFile->Get("RunTree"));
   Trh -> SetBranchAddress("RunHeader",&runHeader);
+  //Trh -> SetBranchStatus("SolidsXHalfLength",0);
+  //Trh -> SetBranchStatus("SolidsYHalfLength",0);
+  //Trh -> SetBranchStatus("SolidsZHalfLength",0);
   Trh -> GetEntry(0);
-  
+  runHeader->Print();
+  G4cout << "dim volumes: " << runHeader->GetVolumes()->size() << G4endl;
+  G4cout << "dim cell: " << runHeader->GetSolidsXHalfLength()->size() << G4endl;
   
   // initialize variables
-  std::vector<G4String> volumeList = runHeader -> GetVolumes();
-  volumeList.push_back("AllVol");
-  std::vector<G4String> particleList = runHeader -> GetParticleList();
+  particleList = runHeader->GetParticleList();
+  for(unsigned int particleIt = 0; particleIt < particleList->size(); ++particleIt)
+  {
+    particleEnabled[particleList->at(particleIt)] = true;
+  }
+  
+  processList = runHeader->GetProcessList();
+  for(unsigned int processIt = 0; processIt < processList->size(); ++processIt)
+  {
+    processEnabled[processList->at(processIt)] = true;
+  }
   
   std::map<G4String,G4float> timeSliceSizes;
   std::map<G4String,G4float> minTimes;
@@ -211,6 +242,56 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h, TFile* f) :
   maxTimes["Hig"] = runHeader->GetMaxTimeHig();
   
   
+  // compute histogram axis
+  std::vector<G4String>* Solids = runHeader->GetSolids();
+  int numXCells  = runHeader->GetXCellNum();
+  int numYCells  = runHeader->GetYCellNum();
+  int numZLayers = runHeader->GetZLayerNum();
+  nBinsX = numXCells;
+  nBinsY = numYCells;
+  nBinsZ = numZLayers*Solids->size();
+  std::cout << "nBinsX: " << nBinsX << "   nBinsY: " << nBinsY << "   nBinsZ: " << nBinsZ << std::endl;
+  double* cellXLength = new double[Solids->size()];
+  double* cellYLength = new double[Solids->size()];
+  double* cellZLength = new double[Solids->size()];
+  double layerZLength = 0.;
+  
+  for(unsigned int solidIt = 0; solidIt < Solids->size(); ++solidIt)
+  {
+    std::cout << "Solid: " << Solids->at(solidIt) << std::endl;
+    cellXLength[solidIt] = 2. * (runHeader->GetSolidsXHalfLength())->at(solidIt);
+    cellYLength[solidIt] = 2. * (runHeader->GetSolidsYHalfLength())->at(solidIt);
+    cellZLength[solidIt] = 2. * (runHeader->GetSolidsZHalfLength())->at(solidIt);
+    layerZLength += cellZLength[solidIt];
+    std::cout << "Solid: " << Solids->at(solidIt) << "   z: " << cellZLength[solidIt] << std::endl;
+    if( solidIt > 0 && ( (cellXLength[solidIt] != cellXLength[0]) ||
+                         (cellYLength[solidIt] != cellYLength[0]) ) )
+    {
+      std::cout << ">>> Detector geometry not supported. Terminating... <<<" << std::endl;
+      exit(-1);
+    }
+  }
+  std::cout << "cell x length: " << cellXLength[0] << "   cell y length: " << cellYLength[0] << "   layer z length: " << layerZLength << std::endl;
+  
+  xAxis = new double[numXCells+1];
+  for(int binx = 0; binx < numXCells+1; ++binx)
+  {
+    xAxis[binx] = -0.5*numXCells*cellXLength[0] + binx*cellXLength[0];
+  }
+  yAxis = new double[numYCells+1];
+  for(int biny = 0; biny < numYCells+1; ++biny)
+  {
+    yAxis[biny] = -0.5*numYCells*cellYLength[0] + biny*cellYLength[0];
+  }
+  zAxis = new double[numZLayers*Solids->size()+1];
+  for(int binz = 0; binz < numZLayers; ++binz)
+  {
+    for(unsigned int solidIt = 0; solidIt < Solids->size(); ++solidIt)
+    {
+      zAxis[binz*Solids->size()+solidIt] = binz*layerZLength + solidIt*cellZLength[solidIt>0?solidIt-1:0];
+    }
+  }
+  zAxis[numZLayers*Solids->size()] = numZLayers*layerZLength;
   
   // create the header command bar
   TGHorizontalFrame* fHor = new TGHorizontalFrame(this,1000,600,kFixedWidth);
@@ -232,25 +313,43 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h, TFile* f) :
   fHor->AddFrame(fGroup1, new TGLayoutHints(kLHintsLeft | kLHintsBottom, 5, 0, 5, 5));
   
   fGroup2 = new TGButtonGroup(fHor,"Time slice type:");
-  new TGRadioButton(fGroup2, Form("low ([%.3f-%.3f] ns, %d slices, slice size: %.3f ns)",minTimes["Low"],maxTimes["Low"],int((maxTimes["Low"]-minTimes["Low"])/timeSliceSizes["Low"]),timeSliceSizes["Low"]), kTextTop);
-  new TGRadioButton(fGroup2, Form("med ([%.3f-%.3f] ns, %d slices, slice size: %.3f ns)",minTimes["Med"],maxTimes["Med"],int((maxTimes["Med"]-minTimes["Med"])/timeSliceSizes["Med"]),timeSliceSizes["Med"]), kTextCenterY);
-  new TGRadioButton(fGroup2, Form("hig ([%.3f-%.3f] ns, %d slices, slice size: %.3f ns)",minTimes["Hig"],maxTimes["Hig"],int((maxTimes["Hig"]-minTimes["Hig"])/timeSliceSizes["Hig"]),timeSliceSizes["Hig"]), kTextBottom);
+  new TGRadioButton(fGroup2, Form("low ([%.3f-%8.3f] ns, %d slices, \n     slice size: %7.3f ns)",minTimes["Low"],maxTimes["Low"],int((maxTimes["Low"]-minTimes["Low"])/timeSliceSizes["Low"]),timeSliceSizes["Low"]), kTextTop);
+  new TGRadioButton(fGroup2, Form("med ([%.3f-%8.3f] ns, %d slices, \n     slice size: %7.3f ns)",minTimes["Med"],maxTimes["Med"],int((maxTimes["Med"]-minTimes["Med"])/timeSliceSizes["Med"]),timeSliceSizes["Med"]), kTextCenterY);
+  new TGRadioButton(fGroup2, Form("hig ([%.3f-%8.3f] ns, %d slices, \n     slice size: %7.3f ns)",minTimes["Hig"],maxTimes["Hig"],int((maxTimes["Hig"]-minTimes["Hig"])/timeSliceSizes["Hig"]),timeSliceSizes["Hig"]), kTextBottom);
   fGroup2->SetButton(kTextTop);
   fGroup2->Connect("Pressed(Int_t)", "MyMainFrame", this, "DoSetTimeSliceType(Int_t)");
   fHor->AddFrame(fGroup2, new TGLayoutHints(kLHintsLeft | kLHintsBottom, 5, 0, 5, 5));
   
   TGGroupFrame* fGroup3 = new TGGroupFrame(fHor,"Min/max time:");
   fHor->AddFrame(fGroup3, new TGLayoutHints(kLHintsLeft | kLHintsBottom, 5, 0, 5, 5));
-  TGLabel* label3_1 = new TGLabel(fGroup3,"min time slice (-1 = underflow):");
+  TGLabel* label3_1 = new TGLabel(fGroup3,"min time slice\n(-1 = underflow):");
   fGroup3->AddFrame(label3_1, new TGLayoutHints(kLHintsLeft | kLHintsTop, 5, 0, 5, 5));
   fNumber3_1 = new TGNumberEntry(fGroup3, 0, 9,999, TGNumberFormat::kNESInteger, TGNumberFormat::kNEAAnyNumber,TGNumberFormat::kNELLimitMinMax, -1, 999);
   (fNumber3_1->GetNumberEntry())->Connect("TextChanged(char*)", "MyMainFrame", this, "DoSetMinTimeSlice(char*)");
   fGroup3 -> AddFrame(fNumber3_1, new TGLayoutHints(kLHintsLeft | kLHintsTop, 5, 0, 5, 5));
-  TGLabel* label3_2 = new TGLabel(fGroup3,"max time slice (nMax+1 = overflow):");
+  TGLabel* label3_2 = new TGLabel(fGroup3,"max time slice\n(nMax+1 = overflow):");
   fGroup3->AddFrame(label3_2, new TGLayoutHints(kLHintsLeft | kLHintsTop, 5, 0, 5, 5));
   fNumber3_2 = new TGNumberEntry(fGroup3, 999, 9,999, TGNumberFormat::kNESInteger, TGNumberFormat::kNEAAnyNumber,TGNumberFormat::kNELLimitMinMax, -1, 999);
   (fNumber3_2->GetNumberEntry())->Connect("TextChanged(char*)", "MyMainFrame", this, "DoSetMaxTimeSlice(char*)");
   fGroup3 -> AddFrame(fNumber3_2, new TGLayoutHints(kLHintsLeft | kLHintsTop, 5, 0, 5, 5));
+  
+  fGroup4 = new TGButtonGroup(fHor,"Particles:");
+  for(unsigned int particleIt = 0; particleIt < particleList->size(); ++particleIt)
+  {
+    TGCheckButton* partButton = new TGCheckButton(fGroup4,particleList->at(particleIt).c_str(),particleIt);
+    partButton->SetOn();
+    partButton->Connect("Toggled(Bool_t)", "MyMainFrame", this, "DoSetParticleEnabled(Bool_t)");
+  }
+  fHor->AddFrame(fGroup4, new TGLayoutHints(kLHintsLeft | kLHintsBottom, 5, 0, 5, 5));
+  
+  fGroup5 = new TGButtonGroup(fHor,"Processes:");
+  for(unsigned int processIt = 0; processIt < processList->size(); ++processIt)
+  {
+    TGCheckButton* partButton = new TGCheckButton(fGroup5,processList->at(processIt).c_str(),processIt);
+    partButton->SetOn();
+    partButton->Connect("Toggled(Bool_t)", "MyMainFrame", this, "DoSetProcessEnabled(Bool_t)");
+  }
+  fHor->AddFrame(fGroup5, new TGLayoutHints(kLHintsLeft | kLHintsBottom, 5, 0, 5, 5));
   
   AddFrame(fHor);
   
@@ -282,7 +381,7 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h, TFile* f) :
   TGTextButton *exit = new TGTextButton(hframe, "&Exit ");
   exit->Connect("Pressed()", "MyMainFrame", this, "DoExit()");
   hframe->AddFrame(exit, new TGLayoutHints(kLHintsCenterX, 5, 5, 3, 4));
-
+  
   AddFrame(hframe, new TGLayoutHints(kLHintsCenterX, 2, 2, 2, 2));
   
   
@@ -295,14 +394,12 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h, TFile* f) :
   
   // Map main frame
   MapWindow();
-  
-  
 }
 
 
 MyMainFrame::~MyMainFrame()
 {
-   // Clean up main frame...
-   Cleanup();
-   delete fCan;
+  // Clean up main frame...
+  Cleanup();
+  delete fCan;
 }

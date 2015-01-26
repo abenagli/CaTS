@@ -16,12 +16,13 @@
     <variable name="i" value="0"/>
     <variable name="j" value="0"/>
     <variable name="k" value="0"/>
-    <constant name="numcol" value="100"/>
-    <constant name="numrow" value="100"/>
-    <constant name="numlay" value="1000"/>
-    <constant name="scalex" value="10"/>
-    <constant name="scaley" value="10"/>
-    <constant name="absThick" value="3"/>
+    <constant name="numcol" value="50"/>
+    <constant name="numrow" value="50"/>
+    <constant name="numlay" value="150"/>
+    <constant name="scalex" value="20"/>
+    <constant name="scaley" value="20"/>
+    <constant name="absThick" value="10"/>
+    <constant name="sciThick" value="10"/>
   </define>
   
   
@@ -63,8 +64,9 @@
   
   
   <solids>
-    <box name="WorldBox"     lunit="mm"  x="10000"   y="10000"   z="10000"/>
-    <box name="AbsorberBox"  lunit="mm"  x="scalex"  y="scaley"  z="absThick"/>
+    <box name="WorldBox"         lunit="mm"  x="10000"   y="10000"   z="10000"/>
+    <box name="AbsorberBox"      lunit="mm"  x="scalex"  y="scaley"  z="absThick"/>
+    <box name="ScintillatorBox"  lunit="mm"  x="scalex"  y="scaley"  z="sciThick"/>
   </solids>
   
   
@@ -76,6 +78,13 @@
       <colorref ref="magenta"/> 
     </volume>
     
+    <volume name="ScintillatorVol">
+      <materialref ref="LuAG"/>
+      <solidref ref="ScintillatorBox"/>
+      <auxiliary auxtype="SensDet" auxvalue="DRTSCalorimeter"/>
+      <colorref ref="blue"/> 
+    </volume>
+    
     <volume name="World">
       <materialref ref="Air"/>
       <solidref ref="WorldBox"/>
@@ -84,7 +93,11 @@
           <loop for="k" from="0" to="numlay" step="1">
             <physvol>
 	      <volumeref ref="AbsorberVol"/>
-              <position name="posjk" x="-0.5*numcol*scalex+i*scalex" y="-0.5*numrow*scaley+j*scaley" z="0.5*absThick+k*absThick"/>
+              <position name="posjk" x="-0.5*numcol*scalex+i*scalex" y="-0.5*numrow*scaley+j*scaley" z="0.5*absThick+k*(absThick+sciThick)"/>
+            </physvol>
+            <physvol>
+	      <volumeref ref="ScintillatorVol"/>
+              <position name="posjk2" x="-0.5*numcol*scalex+i*scalex" y="-0.5*numrow*scaley+j*scaley" z="absThick+0.5*sciThick+k*(absThick+sciThick)"/>
             </physvol>
           </loop>
         </loop>

@@ -21,6 +21,7 @@
 #include "DRTSCalorimeterHit.hh"
 #include "DRTSCalorimeterHit2.hh"
 #include "RunHeader.hh"
+#include "RunAction.hh"
 
 #include "G4Material.hh" 
 #ifdef G4ANALYSIS_USE
@@ -63,33 +64,6 @@ public:
   void SetBirksc2(G4float c2) {
     birksc2 = c2;
   };
-  void SetTimeSliceSizeLow(G4float tslice) {
-    timeSliceSizes["Low"] = tslice;
-  };
-  void SetMinTimeLow(G4float time) {
-    minTimes["Low"] = time;
-  };
-  void SetMaxTimeLow(G4float time) {
-    maxTimes["Low"] = time;
-  };
-  void SetTimeSliceSizeMed(G4float tslice) {
-    timeSliceSizes["Med"] = tslice;
-  };
-  void SetMinTimeMed(G4float time) {
-    minTimes["Med"] = time;
-  };
-  void SetMaxTimeMed(G4float time) {
-    maxTimes["Med"] = time;
-  };
-  void SetTimeSliceSizeHig(G4float tslice) {
-    timeSliceSizes["Hig"] = tslice;
-  };
-  void SetMinTimeHig(G4float time) {
-    minTimes["Hig"] = time;
-  };
-  void SetMaxTimeHig(G4float time) {
-    maxTimes["Hig"] = time;
-  };
   
   G4float GetBirksc1() {
     return birksc1;
@@ -97,35 +71,6 @@ public:
   G4float GetBirksc2() {
     return birksc2;
   };
-  G4float GetTimeSliceSizeLow() {
-    return timeSliceSizes["Low"];
-  };
-  G4float GetMinTimeLow() {
-    return minTimes["Low"];
-  };
-  G4float GetMaxTimeLow() {
-    return maxTimes["Low"];
-  };
-  G4float GetTimeSliceSizeMed() {
-    return timeSliceSizes["Med"];
-  };
-  G4float GetMinTimeMed() {
-    return minTimes["Med"];
-  };
-  G4float GetMaxTimeMed() {
-    return maxTimes["Med"];
-  };
-  G4float GetTimeSliceSizeHig() {
-    return timeSliceSizes["Hig"];
-  };
-  G4float GetMinTimeHig() {
-    return minTimes["Hig"];
-  };
-  G4float GetMaxTimeHig() {
-    return maxTimes["Hig"];
-  };
-  
-  std::vector<G4String>* GetParticleList() { return particleList; };
   
   static DRTSCalorimeterSD* getInstance() { return instance; };
   
@@ -137,6 +82,7 @@ private:
   DRTSCalorimeterSDMessenger* pMessenger;
   
   std::vector<G4String>* particleList;
+  std::vector<G4String>* processList;
   
 #ifdef G4ANALYSIS_USE
     static Analysis* analysis;

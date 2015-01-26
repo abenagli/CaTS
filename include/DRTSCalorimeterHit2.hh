@@ -29,6 +29,7 @@ class DRTSCalorimeterHit2 : public G4VHit
 private:
   
   G4String particleName;
+  G4String processName;
   G4double edep; // total energy deposit 
   G4double eobsbirks; //Birks supressed energy deposition
   G4int nceren; // nr of produced cerenkov photons
@@ -38,7 +39,7 @@ private:
 public:
   
   DRTSCalorimeterHit2();
-  DRTSCalorimeterHit2(G4String pn, G4double de, G4double eobsb, G4int nc, G4ThreeVector p,
+  DRTSCalorimeterHit2(G4String partn, G4String procn, G4double de, G4double eobsb, G4int nc, G4ThreeVector p,
                       G4int ts);
   ~DRTSCalorimeterHit2();
   DRTSCalorimeterHit2(const DRTSCalorimeterHit2&);
@@ -56,8 +57,12 @@ public:
     edep = de;
   };
   
-  inline void SetParticleName(G4String pn) {
-    particleName = pn;
+  inline void SetParticleName(G4String partn) {
+    particleName = partn;
+  };
+  
+  inline void SetProcessName(G4String procn) {
+    processName = procn;
   };
   
   inline void SetEobsbirks(G4double de) {
@@ -79,6 +84,10 @@ public:
   
   inline G4String GetParticleName() {
     return particleName;
+  };
+  
+  inline G4String GetProcessName() {
+    return processName;
   };
   
   inline G4double GetEdep() {

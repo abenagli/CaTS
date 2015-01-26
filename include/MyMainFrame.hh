@@ -28,22 +28,11 @@
 #include <TGTextEntry.h>
 #include <TGNumberEntry.h>
 #include <TGLabel.h>
+#include <TGToolTip.h>
+#include <TStyle.h>
 
-
-
-class GroupBox : public TGGroupFrame
-{
-private:
-  TGComboBox    *fCombo; // combo box
-  TGNumberEntry *fEntry; // number entry 
-
-public:
-  GroupBox(const TGWindow *p, const char *name, const char *title);
-  TGNumberEntry *GetEntry() const { return fEntry; }
-  TGComboBox    *GetCombo() const { return fCombo; }
-  
-  ClassDef(GroupBox,0);
-};
+class Event;
+class RunHeader;
 
 
 
@@ -58,6 +47,12 @@ private:
   int minTimeSlice;
   int maxTimeSlice;
   
+  std::vector<G4String>* particleList;
+  std::map<G4String,bool> particleEnabled;
+  
+  std::vector<G4String>* processList;
+  std::map<G4String,bool> processEnabled;
+  
   TCanvas* c1;
   TFile* inFile;
   TTree* Tevt;
@@ -66,6 +61,12 @@ private:
   RunHeader* runHeader;
   TH2F* h2_yx;
   TH2F* h2_yz;
+  int nBinsX;
+  int nBinsY;
+  int nBinsZ;
+  double* xAxis;
+  double* yAxis;
+  double* zAxis;
   
 public:
   MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h, TFile* f);
@@ -76,6 +77,8 @@ public:
   TGButtonGroup* fGroup2;
   TGNumberEntry* fNumber3_1;
   TGNumberEntry* fNumber3_2;
+  TGButtonGroup* fGroup4;
+  TGButtonGroup* fGroup5;
   
   void DoExit();
   void DoDraw();
@@ -84,6 +87,8 @@ public:
   void DoSetTimeSliceType(Int_t id);
   void DoSetMinTimeSlice(char*);
   void DoSetMaxTimeSlice(char*);
+  void DoSetParticleEnabled(Bool_t val);
+  void DoSetProcessEnabled(Bool_t val);
   void SetStatusText(const char *txt, Int_t pi);
   void EventInfo(Int_t ev, Int_t px, Int_t py, TObject *selected);
   

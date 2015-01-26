@@ -66,19 +66,8 @@ DRTSCalorimeterSD::DRTSCalorimeterSD(G4String name):
   timeSliceTypes.push_back("Med");
   timeSliceTypes.push_back("Hig");
   
-  particleList = new std::vector<G4String>;
-  particleList -> push_back("fragment");
-  particleList -> push_back("meson");
-  particleList -> push_back("baryon");
-  particleList -> push_back("proton_ev");
-  particleList -> push_back("proton_sp");
-  particleList -> push_back("proton_he");
-  particleList -> push_back("mu");
-  particleList -> push_back("pi");
-  particleList -> push_back("e+");
-  particleList -> push_back("e-");
-  particleList -> push_back("gamma");
-  particleList -> push_back("other");
+  particleList = NULL;
+  processList = NULL;
   
   instance = this;
 }
@@ -96,6 +85,18 @@ DRTSCalorimeterSD::~DRTSCalorimeterSD()
 
 void DRTSCalorimeterSD::Initialize(G4HCofThisEvent*)
 {
+  if( particleList == NULL )
+  {
+    RunAction* RA = RunAction::getInstance();
+    
+    timeSliceSizes = RA -> GetTimeSliceSizes();
+    minTimes       = RA -> GetMinTimes();
+    maxTimes       = RA -> GetMaxTimes();
+    
+    particleList = RA -> GetParticleList();
+    processList  = RA -> GetProcessList();
+  }
+  
 #ifdef G4ANALYSIS_USE
   analysis->SDdir->cd();
   G4String SensitiveDetectorDirName = SensitiveDetectorName + "/";
@@ -146,7 +147,7 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   
   times["globalTime"] = globalTime;
   times["localTime1"] = localTime1;
-  times["localTime2"] = localTime2;
+  //times["localTime2"] = localTime2;
   
   globalPositionX -> Fill(globalPosition.x());
   globalPositionY -> Fill(globalPosition.y());
@@ -228,6 +229,9 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   G4Track* theTrack = aStep->GetTrack();
   G4int NCerenPhotons = 0;
   G4String particleName = GetParticleName(theTrack);
+  if( std::find(particleList->begin(),particleList->end(),particleName) == particleList->end() ) particleList->push_back(particleName);
+  G4String processName = (aStep->GetPostStepPoint()->GetProcessDefinedStep())->GetProcessName();
+  if( std::find(processList->begin(),processList->end(),processName) == processList->end() ) processList->push_back(processName);
   G4StepPoint* pPreStepPoint = aStep->GetPreStepPoint();
   G4StepPoint* pPostStepPoint = aStep->GetPostStepPoint();
   const G4float charge = theTrack->GetDefinition()->GetPDGCharge();
@@ -283,8 +287,8 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   (*m_NCeren)[SensitiveDetectorName] += NCerenPhotons;
   
   
-  //-----------------------------------------
-  // event energy per sub-volume and particle
+  //-------------------------------------------------
+  // event energy per sub-volume and particle/process
   
   std::map<G4String, std::map<G4String, G4float> >* m_Edep_byParticle = CaTSEvt->GetEdepByParticleMap();
   std::map<G4String, std::map<G4String, G4float> >* m_Eobs_byParticle = CaTSEvt->GetEobsByParticleMap();
@@ -293,50 +297,91 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   (*m_Eobs_byParticle)[SensitiveDetectorName][particleName] += eobs;
   (*m_NCeren_byParticle)[SensitiveDetectorName][particleName] += G4float(NCerenPhotons);
   
+  std::map<G4String, std::map<G4String, G4float> >* m_Edep_byProcess = CaTSEvt->GetEdepByProcessMap();
+  std::map<G4String, std::map<G4String, G4float> >* m_Eobs_byProcess = CaTSEvt->GetEobsByProcessMap();
+  std::map<G4String, std::map<G4String, G4float > >* m_NCeren_byProcess = CaTSEvt->GetNCerenByProcessMap();
+  (*m_Edep_byProcess)[SensitiveDetectorName][processName] += edep;
+  (*m_Eobs_byProcess)[SensitiveDetectorName][processName] += eobs;
+  (*m_NCeren_byProcess)[SensitiveDetectorName][processName] += G4float(NCerenPhotons);
   
-  //----------------------------------------
-  // event energy per sub-volume and process
-  
-  const G4VProcess * process = aStep -> GetPostStepPoint() -> GetProcessDefinedStep();
-  G4String processName = process -> GetProcessName();
-  G4SteppingManager* fpSteppingManager = G4EventManager::GetEventManager()->GetTrackingManager()->GetSteppingManager();
-  G4String NameofdecayingParticle = "unknown";
-  if( processName == "hadElastic" || processName == "Decay" )
-    NameofdecayingParticle = fpSteppingManager->GetStep()->GetTrack()->GetDynamicParticle()->GetParticleDefinition()->GetParticleName();
-  
-  const G4TrackVector* secondary = fpSteppingManager -> GetSecondary();
-  G4int totsec = fpSteppingManager -> GetfN2ndariesAlongStepDoIt() +
-                 fpSteppingManager -> GetfN2ndariesAtRestDoIt() +
-                 fpSteppingManager -> GetfN2ndariesPostStepDoIt();
-  
-  std::map<G4String,std::map<G4String,G4int > >* processMult = CaTSEvt -> GetProcessMult();
-  std::map<G4String,std::map<G4String,std::map<G4String, products> > >* processMap = CaTSEvt -> GetProcessMap();
-  
-  if( !(processName == "Decay" && NameofdecayingParticle == "triton") ) // triton decay is just there to get rid of long-living tritons
+  if( verbosity )
   {
-    (*processMult)[SensitiveDetectorName][processName] += 1;
-    
-    for(size_t lp = (*secondary).size()-totsec; lp < (*secondary).size(); ++lp) // loop over secondaries
-    {
-      G4String pname = (*secondary)[lp] -> GetParticleDefinition() -> GetParticleName();
-      if ((*secondary)[lp] -> GetParticleDefinition() -> GetParticleType() == "nucleus"
-          && (*secondary)[lp] -> GetParticleDefinition() -> GetParticleSubType() == "generic") {
-        pname = "Fragment";
-      }
-      
-      // check if particle already occurred:
-      if( (*processMap)[SensitiveDetectorName][processName].find(pname) == (*processMap)[SensitiveDetectorName][processName].end() ){
-        (*processMap)[SensitiveDetectorName][processName][pname].NParticles = 1;
-        (*processMap)[SensitiveDetectorName][processName][pname].kinE = (*secondary)[lp] -> GetKineticEnergy();
-        (*processMap)[SensitiveDetectorName][processName][pname].totE = (*secondary)[lp] -> GetTotalEnergy();
-      } else {
-        (*processMap)[SensitiveDetectorName][processName][pname].NParticles++;
-        (*processMap)[SensitiveDetectorName][processName][pname].kinE += (*secondary)[lp] -> GetKineticEnergy();
-        (*processMap)[SensitiveDetectorName][processName][pname].totE += (*secondary)[lp] -> GetTotalEnergy();
-      }
-    } // end loop over secondaries
+    G4cout << ">>> SensitiveVolume: " << SensitiveDetectorName
+           << "   particleName: " << particleName
+           << "   processName: " << processName
+           << "   Edep: " << edep/CLHEP::MeV
+           << G4endl;
   }
   
+  
+  // //-------------------------------------------------------
+  // // event energy per sub-volume and detailed process infos
+  
+  // const G4VProcess * process = aStep -> GetPostStepPoint() -> GetProcessDefinedStep();
+  // G4String processName = process -> GetProcessName();
+  // if( std::find(processList->begin(),processList->end(),processName) == processList->end() )processList->push_back(processName);
+  
+  // G4SteppingManager* fpSteppingManager = G4EventManager::GetEventManager()->GetTrackingManager()->GetSteppingManager();
+  // G4String NameofdecayingParticle = "unknown";
+  // if( processName == "hadElastic" || processName == "Decay" )
+  //   NameofdecayingParticle = fpSteppingManager->GetStep()->GetTrack()->GetDynamicParticle()->GetParticleDefinition()->GetParticleName();
+  
+  // const G4TrackVector* secondary = fpSteppingManager -> GetSecondary();
+  // G4int totsec = fpSteppingManager -> GetfN2ndariesAlongStepDoIt() +
+  //                fpSteppingManager -> GetfN2ndariesAtRestDoIt() +
+  //                fpSteppingManager -> GetfN2ndariesPostStepDoIt();
+  
+  // std::map<G4String,std::map<G4String,G4int > >* processMult = CaTSEvt -> GetProcessMult();
+  // std::map<G4String,std::map<G4String,std::map<G4String, products> > >* processMap = CaTSEvt -> GetProcessMap();
+  
+  // if( !(processName == "Decay" && NameofdecayingParticle == "triton") ) // triton decay is just there to get rid of long-living tritons
+  // {
+  //   (*processMult)[SensitiveDetectorName][processName] += 1;
+    
+  //   for(size_t lp = (*secondary).size()-totsec; lp < (*secondary).size(); ++lp) // loop over secondaries
+  //   {
+  //     G4String pname = (*secondary)[lp] -> GetParticleDefinition() -> GetParticleName();
+  //     if ((*secondary)[lp] -> GetParticleDefinition() -> GetParticleType() == "nucleus"
+  //         && (*secondary)[lp] -> GetParticleDefinition() -> GetParticleSubType() == "generic") {
+  //       pname = "fragment";
+  //     }
+      
+  //     // check if particle already occurred:
+  //     if( (*processMap)[SensitiveDetectorName][processName].find(pname) == (*processMap)[SensitiveDetectorName][processName].end() ){
+  //       (*processMap)[SensitiveDetectorName][processName][pname].NParticles = 1;
+  //       (*processMap)[SensitiveDetectorName][processName][pname].kinE = (*secondary)[lp] -> GetKineticEnergy();
+  //       (*processMap)[SensitiveDetectorName][processName][pname].totE = (*secondary)[lp] -> GetTotalEnergy();
+  //     } else {
+  //       (*processMap)[SensitiveDetectorName][processName][pname].NParticles++;
+  //       (*processMap)[SensitiveDetectorName][processName][pname].kinE += (*secondary)[lp] -> GetKineticEnergy();
+  //       (*processMap)[SensitiveDetectorName][processName][pname].totE += (*secondary)[lp] -> GetTotalEnergy();
+  //     }
+  //   } // end loop over secondaries
+  // }
+  
+  // if( verbosity )
+  // {
+  //   G4cout << ">>> SensitiveVolume: " << SensitiveDetectorName
+  //          << "   processName: " << processName
+  //          << "   Edep: " << edep/CLHEP::MeV
+  //          << G4endl;
+    
+  //   G4cout << ">>> loop over secondaries <<<" << G4endl;
+  //   for(size_t lp = (*secondary).size()-totsec; lp < (*secondary).size(); ++lp) // loop over secondaries
+  //   {
+  //     G4String pname = (*secondary)[lp] -> GetParticleDefinition() -> GetParticleName();
+  //     if ((*secondary)[lp] -> GetParticleDefinition() -> GetParticleType() == "nucleus"
+  //         && (*secondary)[lp] -> GetParticleDefinition() -> GetParticleSubType() == "generic") {
+  //       pname = "fragment";
+  //     }
+      
+  //     G4cout << ">>>>>> processName: " << processName
+  //            << "   pname: " << pname
+  //            << "   num: " << (*processMap)[SensitiveDetectorName][processName][pname].NParticles
+  //            << "   totE: " << (*processMap)[SensitiveDetectorName][processName][pname].totE/CLHEP::MeV
+  //            << G4endl;
+  //   }
+  // }
   
   
   
@@ -375,8 +420,8 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
       (*m_NCeren_byTime)[SensitiveDetectorName][timeSliceName][timeSlice] += NCerenPhotons;
       
       
-      //-----------------------------------------
-      // event energy per sub-volume and particle
+      //-------------------------------------------------
+      // event energy per sub-volume and particle/process
       
       std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String, G4float> > > >* m_Edep_byParticleAndTime = CaTSEvt->GetEdepByParticleAndTimeMap();
       std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String, G4float> > > >* m_Eobs_byParticleAndTime = CaTSEvt->GetEobsByParticleAndTimeMap();
@@ -385,37 +430,44 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
       (*m_Eobs_byParticleAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][particleName] += eobs;
       (*m_NCeren_byParticleAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][particleName] += G4float(NCerenPhotons);
       
+      std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String, G4float> > > >* m_Edep_byProcessAndTime = CaTSEvt->GetEdepByProcessAndTimeMap();
+      std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String, G4float> > > >* m_Eobs_byProcessAndTime = CaTSEvt->GetEobsByProcessAndTimeMap();
+      std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String, G4float> > > >* m_NCeren_byProcessAndTime = CaTSEvt->GetNCerenByProcessAndTimeMap();
+      (*m_Edep_byProcessAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][processName] += edep;
+      (*m_Eobs_byProcessAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][processName] += eobs;
+      (*m_NCeren_byProcessAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][processName] += G4float(NCerenPhotons);
       
-      //----------------------------------------
-      // event energy per sub-volume and process
       
-      std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4int > > > >* processAndTimeMult = CaTSEvt -> GetProcessAndTimeMult();
-      std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4String, products> > > > >* processAndTimeMap = CaTSEvt -> GetProcessAndTimeMap();
+      // //------------------------------------------------------
+      // // event energy per sub-volume and detailed process info
       
-      if( !(processName == "Decay" && NameofdecayingParticle == "triton") ) // triton decay is just there to get rid of long-living tritons
-      {
-        (*processAndTimeMult)[SensitiveDetectorName][timeSliceName][timeSlice][processName] += 1;
+      // std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4int > > > >* processAndTimeMult = CaTSEvt -> GetProcessAndTimeMult();
+      // std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4String, products> > > > >* processAndTimeMap = CaTSEvt -> GetProcessAndTimeMap();
+      
+      // if( !(processName == "Decay" && NameofdecayingParticle == "triton") ) // triton decay is just there to get rid of long-living tritons
+      // {
+      //   (*processAndTimeMult)[SensitiveDetectorName][timeSliceName][timeSlice][processName] += 1;
         
-        for(size_t lp = (*secondary).size()-totsec; lp < (*secondary).size(); ++lp) // loop over secondaries
-        {
-          G4String pname = (*secondary)[lp] -> GetParticleDefinition() -> GetParticleName();
-          if ((*secondary)[lp] -> GetParticleDefinition() -> GetParticleType() == "nucleus"
-              && (*secondary)[lp] -> GetParticleDefinition() -> GetParticleSubType() == "generic") {
-            pname = "Fragment";
-          }
+      //   for(size_t lp = (*secondary).size()-totsec; lp < (*secondary).size(); ++lp) // loop over secondaries
+      //   {
+      //     G4String pname = (*secondary)[lp] -> GetParticleDefinition() -> GetParticleName();
+      //     if ((*secondary)[lp] -> GetParticleDefinition() -> GetParticleType() == "nucleus"
+      //         && (*secondary)[lp] -> GetParticleDefinition() -> GetParticleSubType() == "generic") {
+      //       pname = "fragment";
+      //     }
           
-          // check if particle already occurred:
-          if( (*processAndTimeMap)[SensitiveDetectorName][timeSliceName][timeSlice][processName].find(pname) == (*processAndTimeMap)[SensitiveDetectorName][timeSliceName][timeSlice][processName].end() ){
-            (*processAndTimeMap)[SensitiveDetectorName][timeSliceName][timeSlice][processName][pname].NParticles = 1;
-            (*processAndTimeMap)[SensitiveDetectorName][timeSliceName][timeSlice][processName][pname].kinE = (*secondary)[lp] -> GetKineticEnergy();
-            (*processAndTimeMap)[SensitiveDetectorName][timeSliceName][timeSlice][processName][pname].totE = (*secondary)[lp] -> GetTotalEnergy();
-          } else {
-            (*processAndTimeMap)[SensitiveDetectorName][timeSliceName][timeSlice][processName][pname].NParticles++;
-            (*processAndTimeMap)[SensitiveDetectorName][timeSliceName][timeSlice][processName][pname].kinE += (*secondary)[lp] -> GetKineticEnergy();
-            (*processAndTimeMap)[SensitiveDetectorName][timeSliceName][timeSlice][processName][pname].totE += (*secondary)[lp] -> GetTotalEnergy();
-          }
-        } // end loop over secondaries
-      }
+      //     // check if particle already occurred:
+      //     if( (*processAndTimeMap)[SensitiveDetectorName][timeSliceName][timeSlice][processName].find(pname) == (*processAndTimeMap)[SensitiveDetectorName][timeSliceName][timeSlice][processName].end() ){
+      //       (*processAndTimeMap)[SensitiveDetectorName][timeSliceName][timeSlice][processName][pname].NParticles = 1;
+      //       (*processAndTimeMap)[SensitiveDetectorName][timeSliceName][timeSlice][processName][pname].kinE = (*secondary)[lp] -> GetKineticEnergy();
+      //       (*processAndTimeMap)[SensitiveDetectorName][timeSliceName][timeSlice][processName][pname].totE = (*secondary)[lp] -> GetTotalEnergy();
+      //     } else {
+      //       (*processAndTimeMap)[SensitiveDetectorName][timeSliceName][timeSlice][processName][pname].NParticles++;
+      //       (*processAndTimeMap)[SensitiveDetectorName][timeSliceName][timeSlice][processName][pname].kinE += (*secondary)[lp] -> GetKineticEnergy();
+      //       (*processAndTimeMap)[SensitiveDetectorName][timeSliceName][timeSlice][processName][pname].totE += (*secondary)[lp] -> GetTotalEnergy();
+      //     }
+      //   } // end loop over secondaries
+      // }
       
       
       //------------------------------------
@@ -428,6 +480,7 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
       {
         DRTSCalorimeterHit2* aPreviousHit = (DRTSCalorimeterHit2*)(previousHits.at(j));
         if( particleName == aPreviousHit->GetParticleName() &&
+            processName  == aPreviousHit->GetProcessName() &&
             timeSlice == aPreviousHit->GetTimeSlice() )
         {
           aPreviousHit->SetEdep(edep + aPreviousHit->GetEdep());
@@ -441,7 +494,7 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
       
       if( hitExists == false )
       {
-        DRTSCalorimeterHit2* newHit = new DRTSCalorimeterHit2(particleName,edep,eobs,NCerenPhotons,cellPosition,timeSlice);
+        DRTSCalorimeterHit2* newHit = new DRTSCalorimeterHit2(particleName,processName,edep,eobs,NCerenPhotons,cellPosition,timeSlice);
         (*HCMap)[SensitiveDetectorName][timeSliceName][cellPosition].push_back(newHit);
       }
     }

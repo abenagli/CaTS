@@ -58,6 +58,9 @@ target_link_libraries(${name} ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} 
 add_executable(readHits readHits.cc )
 target_link_libraries(readHits ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
+add_executable(readHits2 readHits2.cc )
+target_link_libraries(readHits2 ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
+
 #add_executable(drawShower drawShower.cc )
 #target_link_libraries(drawShower ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
@@ -85,6 +88,5 @@ target_link_libraries(drawShowerGUI ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRA
 #add_executable(response response.cc )
 #target_link_libraries(response ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
-install (TARGETS ${name} readHits drawShowerGUI DESTINATION bin)
+install (TARGETS ${name} readHits readHits2 drawShowerGUI DESTINATION bin)
 install (TARGETS ${name} ClassesDict DESTINATION lib)
-install (FILES vis.mac pythia_event.data SimpleExtension.xsd DESTINATION bin)

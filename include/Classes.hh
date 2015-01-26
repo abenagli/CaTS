@@ -25,14 +25,16 @@
 #include "TrackerHit.hh"
 #include "MyMainFrame.hh"
 
-Event e;
-RunHeader rh;
-products p;
-G4VHit h;
+Event ev;
+RunHeader runh;
+products pr;
+G4VHit hit;
 DRTSCalorimeterHit2* drtsch;
 
 MyMainFrame* mmf;
-GroupBox* gb;
+
+// general
+std::vector<G4float> vf;
 
 // energy by detector
 std::map<G4String,G4float> sfMap;

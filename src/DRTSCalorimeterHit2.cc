@@ -28,10 +28,11 @@ DRTSCalorimeterHit2::DRTSCalorimeterHit2() {
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-DRTSCalorimeterHit2::DRTSCalorimeterHit2(G4String pn, G4double de, G4double eobsb, G4int nc, G4ThreeVector p,
+DRTSCalorimeterHit2::DRTSCalorimeterHit2(G4String partn, G4String procn, G4double de, G4double eobsb, G4int nc, G4ThreeVector p,
                                          G4int ts)
 {
-  particleName = pn;
+  particleName = partn;
+  processName = procn;
   edep = de;
   eobsbirks = eobsb;
   nceren = nc;
@@ -49,6 +50,7 @@ DRTSCalorimeterHit2::DRTSCalorimeterHit2(const DRTSCalorimeterHit2& right):
   G4VHit()
 {
   particleName = right.particleName;
+  processName = right.processName;
   edep = right.edep;
   eobsbirks = right.eobsbirks;
   nceren = right.nceren;
@@ -61,6 +63,7 @@ DRTSCalorimeterHit2::DRTSCalorimeterHit2(const DRTSCalorimeterHit2& right):
 const DRTSCalorimeterHit2& DRTSCalorimeterHit2::operator=(const DRTSCalorimeterHit2& right)
 {
   particleName = right.particleName;
+  processName = right.processName;
   edep = right.edep;
   eobsbirks = right.eobsbirks;
   nceren = right.nceren;
@@ -105,6 +108,7 @@ void DRTSCalorimeterHit2::Draw()
 void DRTSCalorimeterHit2::Print()
 {
   G4cout << "   particle name: " << particleName
+         << "   process name: " << processName
          << "  energy deposit[MeV]: " << edep/CLHEP::MeV
          << "  birks suppressed energy deposit[MeV]: " <<eobsbirks/CLHEP::MeV
          << "  Nr of cerenkov Photons " << nceren

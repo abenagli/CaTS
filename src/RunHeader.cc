@@ -16,10 +16,23 @@
 #include "RunHeader.hh"
 #include "G4Types.hh"
 
+RunHeader* RunHeader::instance = 0;
+
 
 
 RunHeader::RunHeader()
-{}
+{
+  Solids = new std::vector<G4String>;
+  SolidsXHalfLength = new std::vector<G4float>;
+  SolidsYHalfLength = new std::vector<G4float>;
+  SolidsZHalfLength = new std::vector<G4float>;
+  Volumes = new std::vector<G4String>;
+  
+  particleList = new std::vector<G4String>;
+  processList = new std::vector<G4String>;
+  
+  instance = this;
+}
 
 
 

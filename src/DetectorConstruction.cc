@@ -34,6 +34,10 @@ DetectorConstruction* DetectorConstruction::instance = 0;
 
 DetectorConstruction::DetectorConstruction(G4String fname):
   gdmlFile(fname),
+  Solids(new std::vector<G4String>),
+  SolidsXHalfLength(new std::vector<G4float>),
+  SolidsYHalfLength(new std::vector<G4float>),
+  SolidsZHalfLength(new std::vector<G4float>),
   Volumes(new std::vector<G4String>)
 {
   instance = this;
@@ -49,7 +53,7 @@ G4VPhysicalVolume* DetectorConstruction::ConstructDetector()
   parser = new G4GDMLParser(fReader);
   //    parser.Read(gdmlFile);
   //   World = parser.GetWorldVolume();
-  parser->Read(gdmlFile,false);
+  parser->Read(gdmlFile,true);
   World = parser->GetWorldVolume();
   
   G4SDManager* SDman = G4SDManager::GetSDMpointer();
@@ -122,8 +126,33 @@ G4VPhysicalVolume* DetectorConstruction::ConstructDetector()
       //                            << " to Volume:  " << ((*iter).first) << std::endl;
       //            }
     }
+    
+    
+    Solids -> push_back( (((*iter).first)->GetSolid())->GetName() );
+    if( (((*iter).first)->GetSolid())->GetEntityType() == "G4Box" )
+    {
+      SolidsXHalfLength -> push_back( ((G4Box*)(((*iter).first)->GetSolid()))->GetXHalfLength() );
+      SolidsYHalfLength -> push_back( ((G4Box*)(((*iter).first)->GetSolid()))->GetYHalfLength() );
+      SolidsZHalfLength -> push_back( ((G4Box*)(((*iter).first)->GetSolid()))->GetZHalfLength() );
+    }
+    else
+    {
+      SolidsXHalfLength -> push_back( -999. );
+      SolidsYHalfLength -> push_back( -999. );
+      SolidsZHalfLength -> push_back( -999. );
+    }
   }
   
   G4cout << G4endl;
+  
+  
+  G4float var;
+  var = parser->GetConstant("numcol");
+  numXCells = var+1;
+  var = parser->GetConstant("numrow");
+  numYCells = var+1;
+  var = parser->GetConstant("numlay");
+  numZLayers = var+1;  
+  
   return World;
 }
