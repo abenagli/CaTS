@@ -36,11 +36,17 @@ void MyMainFrame::DoSetMaxTimeSlice(char* val)
 }
 
 
-void MyMainFrame::DoSetEth(char* val)
+void MyMainFrame::DoSetEMin(char* val)
 {
-  Eth = atof(val);
-  if( Eth > 0. ) minZaxis = Eth/1000.;
-  else           minZaxis = 0.1/1000.;
+  EMin = atof(val);
+  if( EMin > 0. ) minZaxis = EMin/1000.;
+  else            minZaxis = 0.1/1000.;
+}
+
+
+void MyMainFrame::DoSetEMax(char* val)
+{
+  EMax = atof(val);
 }
 
 
@@ -148,7 +154,8 @@ void MyMainFrame::DoDraw()
         if( particleEnabled[particleName] == false ) continue;
         if( processEnabled[processName] == false ) continue;
         float Eobs = aHit -> GetEobsbirks(); 
-        if( timeSlice >= minTimeSlice && timeSlice <= maxTimeSlice && Eobs > Eth/1000. )
+        if( timeSlice >= minTimeSlice && timeSlice <= maxTimeSlice &&
+            Eobs > EMin/1000. && Eobs < EMax/1000. )
         {
           h2_yx -> Fill(x,y,Eobs);
           h2_yz -> Fill(z,y,Eobs);
@@ -158,6 +165,8 @@ void MyMainFrame::DoDraw()
   }
   
   // Draw histograms
+  gStyle -> SetOptStat(1001110);
+  
   c1 -> cd(1);
   gPad -> SetLogz();
   gPad->SetRightMargin(0.20);
@@ -225,7 +234,8 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h, TFile* f) :
   runHeader(new RunHeader()),
   h2_yx(NULL),
   h2_yz(NULL),
-  Eth(0.)
+  EMin(0.),
+  EMax(9999.)
 {
   // initialize tree
   Tevt = (TTree*)(inFile->Get("EventTree"));
@@ -237,6 +247,7 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h, TFile* f) :
   
   // initialize variables
   Ein = runHeader-> GetParticleEnergy();
+  EMax = Ein*1000;
   minZaxis = 0.1/1000.;
   maxZaxis = Ein/10.;
   
@@ -360,21 +371,26 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h, TFile* f) :
   
   TGGroupFrame* fGroup6 = new TGGroupFrame(fHor,"Various:");
   fHor->AddFrame(fGroup6, new TGLayoutHints(kLHintsLeft | kLHintsBottom, 5, 0, 5, 5));
-  TGLabel* label6_1 = new TGLabel(fGroup6,"hit E_{th} (MeV):");
+  TGLabel* label6_1 = new TGLabel(fGroup6,"hit min E (MeV):");
   fGroup6->AddFrame(label6_1, new TGLayoutHints(kLHintsLeft | kLHintsTop, 5, 0, 5, 5));
   fNumber6_1 = new TGNumberEntry(fGroup6, 0., 9, 61, TGNumberFormat::kNESReal, TGNumberFormat::kNEANonNegative,TGNumberFormat::kNELLimitMin, 0., 999999.);
-  (fNumber6_1->GetNumberEntry())->Connect("TextChanged(char*)", "MyMainFrame", this, "DoSetEth(char*)");
+  (fNumber6_1->GetNumberEntry())->Connect("TextChanged(char*)", "MyMainFrame", this, "DoSetEMin(char*)");
   fGroup6 -> AddFrame(fNumber6_1, new TGLayoutHints(kLHintsLeft | kLHintsTop, 5, 0, 5, 5));
-  TGLabel* label6_2 = new TGLabel(fGroup6,"min zAxis (MeV):");
+  TGLabel* label6_2 = new TGLabel(fGroup6,"hit max E (MeV):");
   fGroup6->AddFrame(label6_2, new TGLayoutHints(kLHintsLeft | kLHintsTop, 5, 0, 5, 5));
-  fNumber6_2 = new TGNumberEntry(fGroup6, 0.1, 9, 61, TGNumberFormat::kNESReal, TGNumberFormat::kNEAPositive,TGNumberFormat::kNELLimitMin, 0.0001, 999999.);
-  (fNumber6_2->GetNumberEntry())->Connect("TextChanged(char*)", "MyMainFrame", this, "DoSetZAxisMin(char*)");
+  fNumber6_2 = new TGNumberEntry(fGroup6, Ein*1000., 9, 61, TGNumberFormat::kNESReal, TGNumberFormat::kNEANonNegative,TGNumberFormat::kNELLimitMin, 0., 999999.);
+  (fNumber6_2->GetNumberEntry())->Connect("TextChanged(char*)", "MyMainFrame", this, "DoSetEMax(char*)");
   fGroup6 -> AddFrame(fNumber6_2, new TGLayoutHints(kLHintsLeft | kLHintsTop, 5, 0, 5, 5));
-  TGLabel* label6_3 = new TGLabel(fGroup6,"max zAxis (GeV):");
+  TGLabel* label6_3 = new TGLabel(fGroup6,"min zAxis (MeV):");
   fGroup6->AddFrame(label6_3, new TGLayoutHints(kLHintsLeft | kLHintsTop, 5, 0, 5, 5));
-  fNumber6_3 = new TGNumberEntry(fGroup6, Ein/10., 9, 61, TGNumberFormat::kNESReal, TGNumberFormat::kNEAPositive,TGNumberFormat::kNELLimitMin, 0.1, 999999.);
-  (fNumber6_3->GetNumberEntry())->Connect("TextChanged(char*)", "MyMainFrame", this, "DoSetZAxisMax(char*)");
+  fNumber6_3 = new TGNumberEntry(fGroup6, 0.1, 9, 61, TGNumberFormat::kNESReal, TGNumberFormat::kNEAPositive,TGNumberFormat::kNELLimitMin, 0.0001, 999999.);
+  (fNumber6_3->GetNumberEntry())->Connect("TextChanged(char*)", "MyMainFrame", this, "DoSetZAxisMin(char*)");
   fGroup6 -> AddFrame(fNumber6_3, new TGLayoutHints(kLHintsLeft | kLHintsTop, 5, 0, 5, 5));
+  TGLabel* label6_4 = new TGLabel(fGroup6,"max zAxis (GeV):");
+  fGroup6->AddFrame(label6_4, new TGLayoutHints(kLHintsLeft | kLHintsTop, 5, 0, 5, 5));
+  fNumber6_4 = new TGNumberEntry(fGroup6, Ein/10., 9, 61, TGNumberFormat::kNESReal, TGNumberFormat::kNEAPositive,TGNumberFormat::kNELLimitMin, 0.1, 999999.);
+  (fNumber6_4->GetNumberEntry())->Connect("TextChanged(char*)", "MyMainFrame", this, "DoSetZAxisMax(char*)");
+  fGroup6 -> AddFrame(fNumber6_4, new TGLayoutHints(kLHintsLeft | kLHintsTop, 5, 0, 5, 5));
   
   fGroup4 = new TGButtonGroup(fHor,"Particles:");
   for(unsigned int particleIt = 0; particleIt < particleList->size(); ++particleIt)
@@ -385,14 +401,14 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h, TFile* f) :
   }
   fHor->AddFrame(fGroup4, new TGLayoutHints(kLHintsLeft | kLHintsBottom, 5, 0, 5, 5));
   
-  fGroup5 = new TGButtonGroup(fHor,"Processes:");
-  for(unsigned int processIt = 0; processIt < processList->size(); ++processIt)
-  {
-    TGCheckButton* partButton = new TGCheckButton(fGroup5,processList->at(processIt).c_str(),processIt);
-    partButton->SetOn();
-    partButton->Connect("Toggled(Bool_t)", "MyMainFrame", this, "DoSetProcessEnabled(Bool_t)");
-  }
-  fHor->AddFrame(fGroup5, new TGLayoutHints(kLHintsLeft | kLHintsBottom, 5, 0, 5, 5));
+  // fGroup5 = new TGButtonGroup(fHor,"Processes:");
+  // for(unsigned int processIt = 0; processIt < processList->size(); ++processIt)
+  // {
+  //   TGCheckButton* partButton = new TGCheckButton(fGroup5,processList->at(processIt).c_str(),processIt);
+  //   partButton->SetOn();
+  //   partButton->Connect("Toggled(Bool_t)", "MyMainFrame", this, "DoSetProcessEnabled(Bool_t)");
+  // }
+  // fHor->AddFrame(fGroup5, new TGLayoutHints(kLHintsLeft | kLHintsBottom, 5, 0, 5, 5));
   
   AddFrame(fHor);
   
