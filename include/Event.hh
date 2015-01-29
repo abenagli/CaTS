@@ -55,16 +55,10 @@ private:
   std::map<G4String,std::map<G4String,G4float> > m_Edep_byParticle;   // map<Detector,map<particle,energy> >
   std::map<G4String,std::map<G4String,G4float> > m_Eobs_byParticle;   // map<Detector,map<particle,energy> >
   std::map<G4String,std::map<G4String,G4float> > m_NCeren_byParticle; // map<Detector,map<particle,NCeren> >
-  std::map<G4String,std::map<G4String,G4float> > m_Edep_byProcess;    // map<Detector,map<process,energy> >
-  std::map<G4String,std::map<G4String,G4float> > m_Eobs_byProcess;    // map<Detector,map<process,energy> >
-  std::map<G4String,std::map<G4String,G4float> > m_NCeren_byProcess;  // map<Detector,map<process,NCeren> >
   
   std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > > m_Edep_byParticleAndTime;   // map<Detector,map<timeSliceType,map<timeSlice,map<particle,energy> > > >
   std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > > m_Eobs_byParticleAndTime;   // map<Detector,map<timeSliceType,map<timeSlice,map<particle,energy> > > >
   std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > > m_NCeren_byParticleAndTime; // map<Detector,map<timeSliceType,map<timeSlice,map<particle,energy> > > >
-  std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > > m_Edep_byProcessAndTime;    // map<Detector,map<timeSliceType,map<timeSlice,map<process,energy> > > >
-  std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > > m_Eobs_byProcessAndTime;    // map<Detector,map<timeSliceType,map<timeSlice,map<process,energy> > > >
-  std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > > m_NCeren_byProcessAndTime;  // map<Detector,map<timeSliceType,map<timeSlice,map<process,energy> > > >
   
   
   std::map<G4String,std::map<G4String,G4int> > processMult;                       // keep track how often a specific process occurs: map<Detector,map<processes,mult> >
@@ -110,16 +104,10 @@ public:
   std::map<G4String,std::map<G4String,G4float> >* GetEdepByParticleMap()   { return &m_Edep_byParticle;   };
   std::map<G4String,std::map<G4String,G4float> >* GetEobsByParticleMap()   { return &m_Eobs_byParticle;   };
   std::map<G4String,std::map<G4String,G4float> >* GetNCerenByParticleMap() { return &m_NCeren_byParticle; };
-  std::map<G4String,std::map<G4String,G4float> >* GetEdepByProcessMap()    { return &m_Edep_byProcess;   };
-  std::map<G4String,std::map<G4String,G4float> >* GetEobsByProcessMap()    { return &m_Eobs_byProcess;   };
-  std::map<G4String,std::map<G4String,G4float> >* GetNCerenByProcessMap()  { return &m_NCeren_byProcess; };
   
   std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > >* GetEdepByParticleAndTimeMap()   { return &m_Edep_byParticleAndTime;   };
   std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > >* GetEobsByParticleAndTimeMap()   { return &m_Eobs_byParticleAndTime;   };
   std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > >* GetNCerenByParticleAndTimeMap() { return &m_NCeren_byParticleAndTime; };
-  std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > >* GetEdepByProcessAndTimeMap()    { return &m_Edep_byProcessAndTime;    };
-  std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > >* GetEobsByProcessAndTimeMap()    { return &m_Eobs_byProcessAndTime;    };
-  std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > >* GetNCerenByProcessAndTimeMap()  { return &m_NCeren_byProcessAndTime;  };
   
   
   std::map<G4String,std::map<G4String,G4int > >* GetProcessMult() { return &processMult; };

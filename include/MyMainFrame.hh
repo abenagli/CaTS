@@ -67,6 +67,10 @@ private:
   double* xAxis;
   double* yAxis;
   double* zAxis;
+  double minZaxis;
+  double maxZaxis;
+  double Ein;
+  double Eth;
   
 public:
   MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h, TFile* f);
@@ -79,6 +83,9 @@ public:
   TGNumberEntry* fNumber3_2;
   TGButtonGroup* fGroup4;
   TGButtonGroup* fGroup5;
+  TGNumberEntry* fNumber6_1;
+  TGNumberEntry* fNumber6_2;
+  TGNumberEntry* fNumber6_3;
   
   void DoExit();
   void DoDraw();
@@ -87,6 +94,9 @@ public:
   void DoSetTimeSliceType(Int_t id);
   void DoSetMinTimeSlice(char*);
   void DoSetMaxTimeSlice(char*);
+  void DoSetEth(char*);
+  void DoSetZAxisMin(char*);
+  void DoSetZAxisMax(char*);
   void DoSetParticleEnabled(Bool_t val);
   void DoSetProcessEnabled(Bool_t val);
   void SetStatusText(const char *txt, Int_t pi);

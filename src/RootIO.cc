@@ -108,8 +108,11 @@ void RootIO::Write(Event* fevent)
   {
     Int_t bufsize = 64000;
     fevtbranch = fevttree->Branch("Event", &fevent, bufsize, 2);
-    //fevttree -> SetBranchStatus("HCMap",0);
     fevtbranch->SetAutoDelete(kFALSE);
+    
+    for(std::map<G4String,G4int>::const_iterator mapIt = branchStatuses.begin(); mapIt != branchStatuses.end(); ++mapIt)
+      fevttree->SetBranchStatus(mapIt->first,mapIt->second);
+    
     evtInitialized = true;
   }
   
@@ -154,3 +157,14 @@ void RootIO::SetFileName(G4String fname)
 {
   FileName = fname;
 }
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+
+
+void RootIO::SetBranchStatus(G4String bname, G4int bstatus)
+{
+  branchStatuses[bname] = bstatus;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

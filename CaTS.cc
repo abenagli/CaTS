@@ -105,7 +105,8 @@ int main(int argc, char **argv)
   if (path) {
     physName = G4String(path);
   } else {
-    physName = "FTFP_BERT"; // default
+    //physName = "FTFP_BERT"; // default
+    physName = "QGSP_BERT"; // default
   }
   // reference PhysicsList via its name
   if (factory.IsReferencePhysList(physName)) {

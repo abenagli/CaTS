@@ -15,29 +15,37 @@
 #ifndef RootIOMessenger_h
 #define RootIOMessenger_h 1
 
+#include "RootIO.hh"
+
+#include "G4UIdirectory.hh"
 #include "G4UImessenger.hh"
+#include "G4UIcmdWithAString.hh"
+#include "G4UIcmdWithAnInteger.hh"
 #include "globals.hh"
 
 class RootIO;
 class G4UIdirectory;
 class G4UIcmdWithAString;
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+class G4UIcmdWithAnInteger;
 
-class RootIOMessenger : public G4UImessenger {
+
+
+class RootIOMessenger : public G4UImessenger
+{
 public:
-    RootIOMessenger(RootIO*);
-    ~RootIOMessenger();
-
-    void SetNewValue(G4UIcommand*, G4String);
-
+  RootIOMessenger(RootIO*);
+  ~RootIOMessenger();
+  
+  void SetNewValue(G4UIcommand*, G4String);
+  
 private:
-    
-    RootIO* pRootIO;
-    G4UIdirectory*      RootIODir;
-    G4UIcmdWithAString*   pFilenameCmd;
+  
+  RootIO* pRootIO;
+  G4UIdirectory* RootIODir;
+  G4UIcmdWithAString* pFilenameCmd;
+  G4UIcmdWithAnInteger* pBranchStatus1Cmd;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
-

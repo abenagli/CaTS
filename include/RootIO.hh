@@ -36,6 +36,7 @@ public:
   
   static RootIO* GetInstance();
   void SetFileName(G4String);
+  void SetBranchStatus(G4String,G4int);
   void BeginOfRun();
   void Write(Event*);
   void Write(RunHeader*);
@@ -55,6 +56,10 @@ private:
   TTree* fruntree;
   TBranch* fevtbranch;
   TBranch* frunbranch;
+  
+  std::map<G4String,G4int> branchStatuses;
+  
   RootIOMessenger* pMessenger; // pointer to the Messenger
 };
+
 #endif // INCLUDE_ROOTIO_HH

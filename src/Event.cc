@@ -45,16 +45,10 @@ void Event::Reset()
   m_Edep_byParticle.clear();
   m_Eobs_byParticle.clear();
   m_NCeren_byParticle.clear();
-  m_Edep_byProcess.clear();
-  m_Eobs_byProcess.clear();
-  m_NCeren_byProcess.clear();
   
   m_Edep_byParticleAndTime.clear();
   m_Eobs_byParticleAndTime.clear();
   m_NCeren_byParticleAndTime.clear();
-  m_Edep_byProcessAndTime.clear();
-  m_Eobs_byProcessAndTime.clear();
-  m_NCeren_byProcessAndTime.clear();
   
   
   processMult.clear();

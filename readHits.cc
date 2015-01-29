@@ -77,18 +77,14 @@ int main(int argc, char** argv)
   
   std::map<G4String,std::map<G4String,TProfile*> > Eobs_byTime;                               // map<volume,map<timeSliceName,TProfile*> >
   std::map<G4String,std::map<G4String,std::map<G4String,TProfile*> > >Eobs_byParticleAndTime; // map<volume,map<timeSliceName,map<particle,TProfile*> > >
-  std::map<G4String,std::map<G4String,std::map<G4String,TProfile*> > >Eobs_byProcessAndTime;  // map<volume,map<timeSliceName,map<process, TProfile*> > >
   std::map<G4String,std::map<G4String,TProfile*> > EobsFrac_byTime;                               // map<volume,map<timeSliceName,TProfile*> >
   std::map<G4String,std::map<G4String,std::map<G4String,TProfile*> > >EobsFrac_byParticleAndTime; // map<volume,map<timeSliceName,map<particle,TProfile*> > >
-  std::map<G4String,std::map<G4String,std::map<G4String,TProfile*> > >EobsFrac_byProcessAndTime;  // map<volume,map<timeSliceName,map<process, TProfile*> > >
   
   std::map<G4String,std::map<G4String,TProfile*> > Eobs_byTime_cumul;                               // map<volume,map<timeSliceName,TProfile*> >
   std::map<G4String,std::map<G4String,std::map<G4String,TProfile*> > >Eobs_byParticleAndTime_cumul; // map<volume,map<timeSliceName,map<particle,TProfile*> > >
-  std::map<G4String,std::map<G4String,std::map<G4String,TProfile*> > >Eobs_byProcessAndTime_cumul;  // map<volume,map<timeSliceName,map<process, TProfile*> > >
   std::map<G4String,std::map<G4String,TProfile*> > EobsFrac_byTime_cumul;                               // map<volume,map<timeSliceName,TProfile*> >
   std::map<G4String,std::map<G4String,std::map<G4String,TProfile*> > >EobsFrac_byParticleAndTime_cumul; // map<volume,map<timeSliceName,map<particle,TProfile*> > >
-  std::map<G4String,std::map<G4String,std::map<G4String,TProfile*> > >EobsFrac_byProcessAndTime_cumul;  // map<volume,map<timeSliceName,map<process, TProfile*> > >
-
+  
   
   std::map<G4String,std::map<G4String,TProfile2D*> > Eobs_time_vs_z; // map<volume,map<timeSliceName,TProfile2D*> >
   std::map<G4String,std::map<G4String,TProfile2D*> > Eobs_time_vs_R; // map<volume,map<timeSliceName,TProfile2D*> >
@@ -119,8 +115,7 @@ int main(int argc, char** argv)
   
   std::vector<G4String>* volumeList;
   std::vector<G4String>* particleList;
-  std::vector<G4String>* processList;
-
+  
   std::vector<G4String> timeTypes;
   timeTypes.push_back("globalTime");
   timeTypes.push_back("localTime1");
@@ -156,6 +151,8 @@ int main(int argc, char** argv)
     if( buffer.at(0) == '#' ) continue;
     
     TFile* inFile = TFile::Open(buffer.c_str(),"READ");
+    if( !inFile ) continue;
+    
     TTree* Tevt = (TTree*)( inFile->Get("EventTree") );
     TTree* Trh  = (TTree*)( inFile->Get("RunTree") );
     
@@ -191,7 +188,6 @@ int main(int argc, char** argv)
       volumeList = runHeader -> GetVolumes();
       volumeList->push_back("AllVol");
       particleList = runHeader -> GetParticleList();
-      processList  = runHeader -> GetProcessList();
       
       timeSliceSizes["Low"] = runHeader->GetTimeSliceSizeLow();
       timeSliceSizes["Med"] = runHeader->GetTimeSliceSizeMed();
@@ -226,7 +222,6 @@ int main(int argc, char** argv)
         {
           VolumeDirset.insert(std::make_pair(volName,timeDir->mkdir(volName.c_str())));
           VolumeDirset[volName]->mkdir("particleHistos");
-          VolumeDirset[volName]->mkdir("processHistos");
         }
         
         for(unsigned int timeTypeIt = 0; timeTypeIt < timeTypes.size(); ++timeTypeIt)
@@ -266,18 +261,6 @@ int main(int argc, char** argv)
               Eobs_byParticleAndTime_cumul[volName][timeSliceName][partName]     = new TProfile(Form("Eobs%s_cumul_%s_%s",    volName.c_str(),partName.c_str(),timeSliceName.c_str()),"Eobs",nBins,min,max,"s");
               EobsFrac_byParticleAndTime_cumul[volName][timeSliceName][partName] = new TProfile(Form("EobsFrac%s_cumul_%s_%s",volName.c_str(),partName.c_str(),timeSliceName.c_str()),"Eobs",nBins,min,max,"s");
             }
-            for(unsigned int procIt = 0; procIt < processList->size(); ++procIt)
-            {
-              std::string procName = processList->at(procIt);
-              
-              VolumeDirset[volName]->cd("processHistos");
-              
-              Eobs_byProcessAndTime[volName][timeSliceName][procName]     = new TProfile(Form("Eobs%s_%s_%s",    volName.c_str(),procName.c_str(),timeSliceName.c_str()),"Eobs",nBins,min,max,"s");
-              EobsFrac_byProcessAndTime[volName][timeSliceName][procName] = new TProfile(Form("EobsFrac%s_%s_%s",volName.c_str(),procName.c_str(),timeSliceName.c_str()),"Eobs",nBins,min,max,"s");
-              
-              Eobs_byProcessAndTime_cumul[volName][timeSliceName][procName]     = new TProfile(Form("Eobs%s_cumul_%s_%s",    volName.c_str(),procName.c_str(),timeSliceName.c_str()),"Eobs",nBins,min,max,"s");
-              EobsFrac_byProcessAndTime_cumul[volName][timeSliceName][procName] = new TProfile(Form("EobsFrac%s_cumul_%s_%s",volName.c_str(),procName.c_str(),timeSliceName.c_str()),"Eobs",nBins,min,max,"s");
-            }
           }
         }
       }
@@ -290,7 +273,7 @@ int main(int argc, char** argv)
     // loop over events
     
     G4int nEvents = Tevt->GetEntries();
-    //nEvents = 50;
+    //nEvents = 1;
     G4cout << "Nr. of Events:  " << nEvents << " in input file "<< buffer << G4endl;
     for(G4int entry = 0; entry < nEvents; ++entry)
     {
@@ -313,7 +296,6 @@ int main(int argc, char** argv)
       
       std::map<G4String,std::map<G4String,std::map<G4int,G4float> > >* m_Eobs_byTime = event->GetEobsByTimeMap(); // map<Detector,map<timeSliceType,map<timeSlice,energy> > >
       std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > >* m_Eobs_byParticleAndTime = event->GetEobsByParticleAndTimeMap(); // map<Detector,map<timeSliceType,map<timeSlice,map<particle,energy> > > >
-      std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > >* m_Eobs_byProcessAndTime  = event->GetEobsByProcessAndTimeMap();  // map<Detector,map<timeSliceType,map<timeSlice,map<process,energy> > > >
       
       
       // for(unsigned int volIt = 0; volIt < volumeList->size()-1; ++volIt)
@@ -356,18 +338,6 @@ int main(int argc, char** argv)
       
       //           Eobs_byParticleAndTime_cumul[volName][timeSliceName][partName]      -> Fill( time,sumPart[partName] );
       //           EobsFrac_byParticleAndTime_cumul[volName][timeSliceName][partName]  -> Fill( time,sumPart[partName] / Eobs );
-      //         }
-      
-      //         for(unsigned int procIt = 0; procIt < processList->size(); ++procIt)
-      //         {
-      //           std::string procName = processList->at(procIt);
-      //           sumProc[procName] += (*m_Eobs_byProcessAndTime)[volName][timeSliceName][bin][procName];
-      
-      //           Eobs_byProcessAndTime[volName][timeSliceName][procName]      -> Fill( time,(*m_Eobs_byProcessAndTime)[volName][timeSliceName][bin][procName] );
-      //           EobsFrac_byProcessAndTime[volName][timeSliceName][procName]  -> Fill( time,(*m_Eobs_byProcessAndTime)[volName][timeSliceName][bin][procName] / Eobs );
-      
-      //           Eobs_byProcessAndTime_cumul[volName][timeSliceName][procName]      -> Fill( time,sumProc[procName] );
-      //           EobsFrac_byProcessAndTime_cumul[volName][timeSliceName][procName]  -> Fill( time,sumProc[procName] / Eobs );
       //         }
       //       }
       //     }
@@ -436,41 +406,20 @@ int main(int argc, char** argv)
               EobsFrac_byParticleAndTime_cumul["AllVol"][timeSliceName][partName] -> Fill( time,sumPart[partName] / Eobs );
             }
             
-            for(unsigned int procIt = 0; procIt < processList->size(); ++procIt)
-            {
-              std::string procName = processList->at(procIt);
-              volSum = 0.;
-              for(unsigned int volIt = 0; volIt < volumeList->size()-1; ++volIt)
-              {
-                G4String volName = volumeList->at(volIt);
-                sumProc[procName] += (*m_Eobs_byProcessAndTime)[volName][timeSliceName][bin][procName];
-                volSum += (*m_Eobs_byProcessAndTime)[volName][timeSliceName][bin][procName];
-                
-                Eobs_byProcessAndTime[volName][timeSliceName][procName]      -> Fill( time,(*m_Eobs_byProcessAndTime)[volName][timeSliceName][bin][procName] );
-                EobsFrac_byProcessAndTime[volName][timeSliceName][procName]  -> Fill( time,(*m_Eobs_byProcessAndTime)[volName][timeSliceName][bin][procName] / Eobs );
-                
-                Eobs_byProcessAndTime_cumul[volName][timeSliceName][procName]      -> Fill( time,sumProc[procName] );
-                EobsFrac_byProcessAndTime_cumul[volName][timeSliceName][procName]  -> Fill( time,sumProc[procName] / Eobs );
-              }
-              
-              Eobs_byProcessAndTime["AllVol"][timeSliceName][procName]     -> Fill( time,volSum );
-              EobsFrac_byProcessAndTime["AllVol"][timeSliceName][procName] -> Fill( time,volSum / Eobs );
-              
-              Eobs_byProcessAndTime_cumul["AllVol"][timeSliceName][procName]     -> Fill( time,sumProc[procName] );
-              EobsFrac_byProcessAndTime_cumul["AllVol"][timeSliceName][procName] -> Fill( time,sumProc[procName] / Eobs );
-            }
           }
         }
       }
     } // end loop over events
+    std::cout << "\n>>> loop over events done" << std::endl;
     
     delete runHeader;
+    std::cout << "qui1" << std::endl;
     delete event;
+    std::cout << "qui2" << std::endl;
     inFile -> Close();
+    std::cout << "qui3" << std::endl;
   }
-  
-  G4cout << G4endl;
-  G4cout << G4endl;
+  std::cout << "AAAA" << std::endl;
   G4cout << G4endl;
   
   
@@ -500,16 +449,6 @@ int main(int argc, char** argv)
   //         VolumeDirset[volName] -> cd("particleHistos");
       
   //         prof = (TProfile*)( gDirectory->Get(Form("Eobs%s_%s_%s",volName.c_str(),partName.c_str(),timeSliceName.c_str())) );
-  //         GetCumulative(prof,1,event->GetTotObsEnergy());
-  //       }
-        
-  //       for(unsigned int procIt = 0; procIt < processList->size(); ++procIt)
-  //       {
-  //         G4String procName = processList->at(procIt);
-          
-  //         VolumeDirset[volName] -> cd("processHistos");
-          
-  //         prof = (TProfile*)( gDirectory->Get(Form("Eobs%s_%s_%s",volName.c_str(),procName.c_str(),timeSliceName.c_str())) );
   //         GetCumulative(prof,1,event->GetTotObsEnergy());
   //       }
   //     }
