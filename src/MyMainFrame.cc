@@ -145,6 +145,7 @@ void MyMainFrame::DoDraw()
       double y = (mapIt->first).y();
       double z = (mapIt->first).z();
       std::vector<G4VHit*> hitVec = mapIt->second;
+      double Eobs = 0.;
       for(unsigned int vecIt = 0; vecIt < hitVec.size(); ++vecIt)
       {
         DRTSCalorimeterHit2* aHit = dynamic_cast<DRTSCalorimeterHit2*>(hitVec.at(vecIt));
@@ -153,13 +154,13 @@ void MyMainFrame::DoDraw()
         G4String processName = aHit -> GetProcessName();
         if( particleEnabled[particleName] == false ) continue;
         if( processEnabled[processName] == false ) continue;
-        float Eobs = aHit -> GetEobsbirks(); 
-        if( timeSlice >= minTimeSlice && timeSlice <= maxTimeSlice &&
-            Eobs > EMin/1000. && Eobs < EMax/1000. )
-        {
-          h2_yx -> Fill(x,y,Eobs);
-          h2_yz -> Fill(z,y,Eobs);
-        }
+        if( timeSlice >= minTimeSlice && timeSlice <= maxTimeSlice )
+          Eobs += aHit -> GetEobsbirks(); 
+      }
+      if( Eobs > EMin/1000. && Eobs < EMax/1000. )
+      {
+        h2_yx -> Fill(x,y,Eobs);
+        h2_yz -> Fill(z,y,Eobs);
       }
     }
   }
@@ -371,12 +372,12 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h, TFile* f) :
   
   TGGroupFrame* fGroup6 = new TGGroupFrame(fHor,"Various:");
   fHor->AddFrame(fGroup6, new TGLayoutHints(kLHintsLeft | kLHintsBottom, 5, 0, 5, 5));
-  TGLabel* label6_1 = new TGLabel(fGroup6,"hit min E (MeV):");
+  TGLabel* label6_1 = new TGLabel(fGroup6,"cell min E (MeV):");
   fGroup6->AddFrame(label6_1, new TGLayoutHints(kLHintsLeft | kLHintsTop, 5, 0, 5, 5));
   fNumber6_1 = new TGNumberEntry(fGroup6, 0., 9, 61, TGNumberFormat::kNESReal, TGNumberFormat::kNEANonNegative,TGNumberFormat::kNELLimitMin, 0., 999999.);
   (fNumber6_1->GetNumberEntry())->Connect("TextChanged(char*)", "MyMainFrame", this, "DoSetEMin(char*)");
   fGroup6 -> AddFrame(fNumber6_1, new TGLayoutHints(kLHintsLeft | kLHintsTop, 5, 0, 5, 5));
-  TGLabel* label6_2 = new TGLabel(fGroup6,"hit max E (MeV):");
+  TGLabel* label6_2 = new TGLabel(fGroup6,"cell max E (MeV):");
   fGroup6->AddFrame(label6_2, new TGLayoutHints(kLHintsLeft | kLHintsTop, 5, 0, 5, 5));
   fNumber6_2 = new TGNumberEntry(fGroup6, Ein*1000., 9, 61, TGNumberFormat::kNESReal, TGNumberFormat::kNEANonNegative,TGNumberFormat::kNELLimitMin, 0., 999999.);
   (fNumber6_2->GetNumberEntry())->Connect("TextChanged(char*)", "MyMainFrame", this, "DoSetEMax(char*)");
