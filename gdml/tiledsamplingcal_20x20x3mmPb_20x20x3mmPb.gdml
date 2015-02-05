@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<gdml xmlns:gdml_simple_extension="http://www.example.org"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema-instance"          
+      xs:noNamespaceSchemaLocation="SimpleExtension.xsd">
+  
+  
+  <extension>
+    <color name="test_color"  R="0.1"  G="0.2"  B="0.3"  A="1.0" />
+    <color name="magenta"     R="1.0"  G="0.0"  B="0.0"  A="1.0" />
+    <color name="blue"        R="0.0"  G="0.0"  B="1.0"  A="1.0" />   
+  </extension>
+  
+  
+  <define>
+    <variable name="i" value="0"/>
+    <variable name="j" value="0"/>
+    <variable name="k" value="0"/>
+    <constant name="numcol" value="50"/>
+    <constant name="numrow" value="50"/>
+    <constant name="numlay" value="500"/>
+    <constant name="scalex" value="20"/>
+    <constant name="scaley" value="20"/>
+    <constant name="absThick" value="3"/>
+    <constant name="sciThick" value="3"/>
+  </define>
+  
+  
+  <materials>
+    <element name="H"   formula="H"  Z="1.">  <atom value="  1.008" unit="g/mole"/> </element>
+    <element name="C"   formula="C"  Z="6.">  <atom value=" 12.011" unit="g/mole"/> </element>
+    <element name="N"   formula="N"  Z="7.">  <atom value=" 14.007" unit="g/mole"/> </element>
+    <element name="O"   formula="O"  Z="8.">  <atom value=" 16.000" unit="g/mole"/> </element>
+    <element name="F"   formula="F"  Z="9.">  <atom value=" 18.998" unit="g/mole"/> </element>
+    <element name="Al"  formula="Al" Z="13."> <atom value=" 26.981" unit="g/mole"/> </element>
+    <element name="Fe"  formula="Fe" Z="26."> <atom value=" 55.845" unit="g/mole"/> </element>
+    <element name="Lu"  formula="Lu" Z="71."> <atom value="174.967" unit="g/mole"/> </element>
+    <element name="Pb"  formula="Pb" Z="82."> <atom value="207.200" unit="g/mole"/> </element>
+    
+    <material Z="1.0" name="Vacuum">
+      <D value="1e-24"/>
+      <atom value="1.00794"/>
+    </material>
+    
+    <material name="Air">
+      <D value="1.290" unit="mg/cm3"/>
+      <fraction n="0.7" ref="N"/>
+      <fraction n="0.3" ref="O"/>
+    </material>
+    
+    <material name="LuAG">
+      <D value="6.700" unit="g/cm3"/>
+      <composite n="3"  ref="Lu"/> 
+      <composite n="12" ref="Al"/> 
+      <composite n="5"  ref="O"/> 
+    </material>
+    
+    <material name="Lead">
+      <D value="11.340" unit="g/cm3"/>
+      <composite n="1" ref="Pb"/> 
+    </material>
+    
+  </materials>
+  
+  
+  <solids>
+    <box name="WorldBox"         lunit="mm"  x="10000"   y="10000"   z="10000"/>
+    <box name="AbsorberBox"      lunit="mm"  x="scalex"  y="scaley"  z="absThick"/>
+    <box name="ScintillatorBox"  lunit="mm"  x="scalex"  y="scaley"  z="sciThick"/>
+  </solids>
+  
+  
+  <structure>
+    <volume name="AbsorberVol">
+      <materialref ref="Lead"/>
+      <solidref ref="AbsorberBox"/>
+      <auxiliary auxtype="SensDet" auxvalue="DRTSCalorimeter"/>
+      <colorref ref="magenta"/> 
+    </volume>
+    
+    <volume name="ScintillatorVol">
+      <materialref ref="Lead"/>
+      <solidref ref="ScintillatorBox"/>
+      <auxiliary auxtype="SensDet" auxvalue="DRTSCalorimeter"/>
+      <colorref ref="blue"/> 
+    </volume>
+    
+    <volume name="World">
+      <materialref ref="Air"/>
+      <solidref ref="WorldBox"/>
+      <loop for="i" from="0" to="numcol" step="1">
+        <loop for="j" from="0" to="numrow" step="1">
+          <loop for="k" from="0" to="numlay" step="1">
+            <physvol>
+	      <volumeref ref="AbsorberVol"/>
+              <position name="posjk" x="-0.5*numcol*scalex+i*scalex" y="-0.5*numrow*scaley+j*scaley" z="0.5*absThick+k*(absThick+sciThick)"/>
+            </physvol>
+            <physvol>
+	      <volumeref ref="ScintillatorVol"/>
+              <position name="posjk2" x="-0.5*numcol*scalex+i*scalex" y="-0.5*numrow*scaley+j*scaley" z="absThick+0.5*sciThick+k*(absThick+sciThick)"/>
+            </physvol>
+          </loop>
+        </loop>
+      </loop>
+      <colorref ref="blue"/> 
+    </volume>
+  </structure>
+  
+  
+  <setup version="1.0" name="Default">
+    <world ref="World"/>
+  </setup>
+  
+</gdml>
