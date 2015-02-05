@@ -143,7 +143,7 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   
   const G4float globalTime = aStep->GetPreStepPoint()->GetGlobalTime();
   const G4float localTime1 = globalTime - cellPosition.z()/c_light + offsetPosition/c_light;
-  const G4float localTime2 = globalTime - sqrt(pow(cellPosition.x(),2)+pow(cellPosition.y(),2)+pow(cellPosition.z(),2))/c_light  + offsetPosition/c_light;
+  //const G4float localTime2 = globalTime - sqrt(pow(cellPosition.x(),2)+pow(cellPosition.y(),2)+pow(cellPosition.z(),2))/c_light  + offsetPosition/c_light;
   
   times["globalTime"] = globalTime;
   times["localTime1"] = localTime1;
@@ -301,13 +301,18 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   
   if( verbosity )
   {
-    G4cout << ">>> SensitiveVolume: " << SensitiveDetectorName
-           << "   particleName: " << particleName
-           << "   processName: " << processName
-           << "   Edep: " << edep/CLHEP::MeV
-           << G4endl;
+    if( cellPosition.x() > -10. && cellPosition.x() < 10. &&
+        cellPosition.y() > -10. && cellPosition.y() < 10. &&
+        cellPosition.z() >  54. && cellPosition.z() < 57. &&
+        particleName == "gamma" )
+    {
+      G4cout << ">>> SensitiveVolume: " << SensitiveDetectorName
+             << "   processName: " << processName
+             << "   particleName: " << particleName
+             << "   Edep: " << edep*1000
+             << G4endl;
+    }
   }
-  
   
   //-----------------------
   // detailed process infos

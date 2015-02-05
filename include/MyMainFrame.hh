@@ -47,6 +47,9 @@ private:
   int minTimeSlice;
   int maxTimeSlice;
   
+  std::vector<G4String>* volumeList;
+  std::map<G4String,bool> volumeEnabled;
+  
   std::vector<G4String>* particleList;
   std::map<G4String,bool> particleEnabled;
   
@@ -100,6 +103,7 @@ public:
   void DoSetEMax(char*);
   void DoSetZAxisMin(char*);
   void DoSetZAxisMax(char*);
+  void DoSetVolumeEnabled(Bool_t val);
   void DoSetParticleEnabled(Bool_t val);
   void DoSetProcessEnabled(Bool_t val);
   void SetStatusText(const char *txt, Int_t pi);

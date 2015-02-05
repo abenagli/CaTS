@@ -48,7 +48,7 @@ set_target_properties(ClassesDict PROPERTIES ${ROOT_LIBRARY_PROPERTIES})
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
-SET(ROOT_LIBRARIES "${ROOT_LIBRARIES} -lGui")
+SET(ROOT_LIBRARIES "${ROOT_LIBRARIES} -lGui -lXrdXrootd")
 
 target_link_libraries(ClassesDict  ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex Reflex)
 
@@ -58,14 +58,11 @@ target_link_libraries(${name} ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} 
 add_executable(readHits readHits.cc )
 target_link_libraries(readHits ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
-add_executable(readHits2 readHits2.cc )
-target_link_libraries(readHits2 ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
-
-#add_executable(drawShower drawShower.cc )
-#target_link_libraries(drawShower ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
-
 add_executable(drawShowerGUI drawShowerGUI.cc )
 target_link_libraries(drawShowerGUI ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
+
+add_executable(drawShowerGif drawShowerGif.cc )
+target_link_libraries(drawShowerGif ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
 #add_executable(DumpHeader DumpHeader.cc )
 #target_link_libraries(DumpHeader ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
@@ -88,5 +85,5 @@ target_link_libraries(drawShowerGUI ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRA
 #add_executable(response response.cc )
 #target_link_libraries(response ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
-install (TARGETS ${name} readHits readHits2 drawShowerGUI DESTINATION bin)
+install (TARGETS ${name} readHits drawShowerGUI drawShowerGif DESTINATION bin)
 install (TARGETS ${name} ClassesDict DESTINATION lib)

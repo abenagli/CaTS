@@ -42,10 +42,14 @@ private:
   G4float TotObsEnergy; // total energy observed/Evt
   G4float TotNCeren;    // total number of Cerenkov photons/Evt
   
-  
+ 
   std::map<G4String,G4float> m_Edep;   // map<Detector,energy>
   std::map<G4String,G4float> m_Eobs;   // map<Detector,energy>
   std::map<G4String,G4float> m_NCeren; // map<Detector,energy>
+  
+  std::map<G4String,std::map<G4ThreeVector,G4float> > m_Edep_byPos;   // map<Detector,energy>
+  std::map<G4String,std::map<G4ThreeVector,G4float> > m_Eobs_byPos;   // map<Detector,energy>
+  std::map<G4String,std::map<G4ThreeVector,G4float> > m_NCeren_byPos; // map<Detector,energy>
   
   std::map<G4String,std::map<G4String,std::map<G4int,G4float> > > m_Edep_byTime;   // map<Detector,map<timeSliceType,map<timeSlice,energy> > >
   std::map<G4String,std::map<G4String,std::map<G4int,G4float> > > m_Eobs_byTime;   // map<Detector,map<timeSliceType,map<timeSlice,energy> > >
@@ -95,6 +99,10 @@ public:
   std::map<G4String,G4float>* GetEdepMap()   { return &m_Edep;   };
   std::map<G4String,G4float>* GetEobsMap()   { return &m_Eobs;   };
   std::map<G4String,G4float>* GetNCerenMap() { return &m_NCeren; };
+  
+  std::map<G4String,std::map<G4ThreeVector,G4float> >* GetEdepByPosMap()   { return &m_Edep_byPos;   };
+  std::map<G4String,std::map<G4ThreeVector,G4float> >* GetEobsByPosMap()   { return &m_Eobs_byPos;   };
+  std::map<G4String,std::map<G4ThreeVector,G4float> >* GetNCerenByPosMap() { return &m_NCeren_byPos; };
   
   std::map<G4String,std::map<G4String,std::map<G4int,G4float> > >* GetEdepByTimeMap()   { return &m_Edep_byTime;   };
   std::map<G4String,std::map<G4String,std::map<G4int,G4float> > >* GetEobsByTimeMap()   { return &m_Eobs_byTime;   };

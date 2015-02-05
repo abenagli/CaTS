@@ -62,6 +62,18 @@ void MyMainFrame::DoSetZAxisMax(char* val)
 }
 
 
+void MyMainFrame::DoSetVolumeEnabled(Bool_t val)
+{
+  TGCheckButton* btn = (TGCheckButton*)(gTQSender);
+  int id = btn->WidgetId();
+  
+  G4String volumeName = volumeList->at(id);
+  volumeEnabled[volumeName] = val;
+  if( val == false ) std::cout << ">>> Disabling " << volumeName << std::endl;
+  if( val == true )  std::cout << ">>> Enabling "  << volumeName << std::endl;
+}
+
+
 void MyMainFrame::DoSetParticleEnabled(Bool_t val)
 {
   TGCheckButton* btn = (TGCheckButton*)(gTQSender);
@@ -126,19 +138,20 @@ void MyMainFrame::DoDraw()
   // Fill histograms
   if( h2_yx != NULL ) delete h2_yx;
   h2_yx = new TH2F(Form("h2_yx"),"y-x view",nBinsY,yAxis,nBinsX,xAxis);
-  h2_yx -> SetTitle(";x (mm);y (mm);#LTE_{obs}#GT (GeV)");
+  h2_yx -> SetTitle(";x (mm);y (mm);E_{obs} (GeV)");
   h2_yx -> GetZaxis() -> SetTitleOffset(1.50);
   
   if( h2_yz != NULL ) delete h2_yz;  
   h2_yz = new TH2F(Form("h2_yz"),"y-z view",nBinsZ,zAxis,nBinsY,yAxis);
-  h2_yz -> SetTitle(";z (mm);y (mm);#LTE_{obs}#GT (GeV)");
+  h2_yz -> SetTitle(";z (mm);y (mm);E_{obs} (GeV)");
   h2_yz -> GetZaxis() -> SetTitleOffset(1.50);
   
-  std::vector<G4String>* Volumes = runHeader -> GetVolumes();
-  for(unsigned int volIt = 0; volIt < Volumes->size(); ++volIt)
+  for(unsigned int volIt = 0; volIt < volumeList->size(); ++volIt)
   {
-    G4String volName = Volumes->at(volIt);
-    std::map<G4ThreeVector,std::vector<G4VHit*> > posHitMap = (*HCMap)[volName][timeSliceString];
+    G4String volumeName = volumeList->at(volIt);
+    if( volumeEnabled[volumeName] == false ) continue;
+    
+    std::map<G4ThreeVector,std::vector<G4VHit*> > posHitMap = (*HCMap)[volumeName][timeSliceString];
     for(std::map<G4ThreeVector,std::vector<G4VHit*> >::const_iterator mapIt = posHitMap.begin(); mapIt != posHitMap.end(); ++mapIt)
     {
       double x = (mapIt->first).x();
@@ -252,6 +265,12 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h, TFile* f) :
   minZaxis = 0.1/1000.;
   maxZaxis = Ein/10.;
   
+  volumeList = runHeader -> GetVolumes();
+  for(unsigned int volIt = 0; volIt < volumeList->size(); ++volIt)
+  {
+    volumeEnabled[volumeList->at(volIt)] = true;
+  }
+  
   particleList = runHeader->GetParticleList();
   for(unsigned int particleIt = 0; particleIt < particleList->size(); ++particleIt)
   {
@@ -281,6 +300,14 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h, TFile* f) :
   
   // compute histogram axis
   std::vector<G4String>* Solids = runHeader->GetSolids();
+  std::vector<G4float>* SolidsXHalfLength = runHeader->GetSolidsXHalfLength();
+  std::vector<G4float>* SolidsYHalfLength = runHeader->GetSolidsYHalfLength();
+  std::vector<G4float>* SolidsZHalfLength = runHeader->GetSolidsZHalfLength();
+  std::reverse(Solids->begin(),Solids->end());
+  std::reverse(SolidsXHalfLength->begin(),SolidsXHalfLength->end());
+  std::reverse(SolidsYHalfLength->begin(),SolidsYHalfLength->end());
+  std::reverse(SolidsZHalfLength->begin(),SolidsZHalfLength->end());
+  
   int numXCells  = runHeader->GetXCellNum();
   int numYCells  = runHeader->GetYCellNum();
   int numZLayers = runHeader->GetZLayerNum();
@@ -296,9 +323,9 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h, TFile* f) :
   for(unsigned int solidIt = 0; solidIt < Solids->size(); ++solidIt)
   {
     std::cout << "Solid: " << Solids->at(solidIt) << std::endl;
-    cellXLength[solidIt] = 2. * (runHeader->GetSolidsXHalfLength())->at(solidIt);
-    cellYLength[solidIt] = 2. * (runHeader->GetSolidsYHalfLength())->at(solidIt);
-    cellZLength[solidIt] = 2. * (runHeader->GetSolidsZHalfLength())->at(solidIt);
+    cellXLength[solidIt] = 2. * SolidsXHalfLength->at(solidIt);
+    cellYLength[solidIt] = 2. * SolidsYHalfLength->at(solidIt);
+    cellZLength[solidIt] = 2. * SolidsZHalfLength->at(solidIt);
     layerZLength += cellZLength[solidIt];
     std::cout << "Solid: " << Solids->at(solidIt) << "   z: " << cellZLength[solidIt] << std::endl;
     if( solidIt > 0 && ( (cellXLength[solidIt] != cellXLength[0]) ||
@@ -330,16 +357,25 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h, TFile* f) :
   }
   zAxis[numZLayers*Solids->size()] = numZLayers*layerZLength;
   
+  
   // create the header command bar
   TGHorizontalFrame* fHor = new TGHorizontalFrame(this,1000,600,kFixedWidth);
   
   TGGroupFrame* fGroup = new TGGroupFrame(fHor,"Event");
   fHor->AddFrame(fGroup, new TGLayoutHints(kLHintsLeft | kLHintsBottom, 5, 0, 5, 5));
-  TGLabel* label = new TGLabel(fGroup,"Evt. number: ");
-  fGroup->AddFrame(label, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 0, 5, 5));
+  TGLabel* label_1 = new TGLabel(fGroup,"Evt. number: ");
+  fGroup->AddFrame(label_1, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 0, 5, 5));
   fNumber = new TGNumberEntry(fGroup, 0, 9,999, TGNumberFormat::kNESInteger, TGNumberFormat::kNEAAnyNumber,TGNumberFormat::kNELLimitMinMax, 0, 999999);
   (fNumber->GetNumberEntry())->Connect("TextChanged(char*)", "MyMainFrame", this, "DoSetEventId(char*)");
   fGroup -> AddFrame(fNumber, new TGLayoutHints(kLHintsLeft | kLHintsCenterY, 5, 0, 5, 5));
+  TGButtonGroup* volGroup = new TGButtonGroup(fHor,"Volumes:");
+  for(unsigned int volIt = 0; volIt < volumeList->size(); ++volIt)
+  {
+    TGCheckButton* volButton = new TGCheckButton(volGroup,volumeList->at(volIt).c_str(),volIt);
+    volButton->SetOn();
+    volButton->Connect("Toggled(Bool_t)", "MyMainFrame", this, "DoSetVolumeEnabled(Bool_t)");
+  }
+  fHor->AddFrame(volGroup, new TGLayoutHints(kLHintsLeft | kLHintsBottom, 5, 0, 5, 5));
   
   fGroup1 = new TGButtonGroup(fHor,"Time type:");
   new TGRadioButton(fGroup1, "global", kTextTop);
@@ -411,7 +447,7 @@ MyMainFrame::MyMainFrame(const TGWindow *p, UInt_t w, UInt_t h, TFile* f) :
   // }
   // fHor->AddFrame(fGroup5, new TGLayoutHints(kLHintsLeft | kLHintsBottom, 5, 0, 5, 5));
   
-  AddFrame(fHor);
+  AddFrame(fHor,new TGLayoutHints(kLHintsTop | kLHintsLeft | kLHintsExpandX));
   
   
   // Create the embedded canvas

@@ -1,5 +1,5 @@
 #include "MyMainFrame.hh"
-#include "setTDRStyle.h"
+#include "setTDRStyle.hh"
 
 #include "Cintex/Cintex.h"
 #include "TApplication.h"

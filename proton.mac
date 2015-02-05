@@ -1,31 +1,25 @@
-/CaTS/RootIO/Filename proton_50GeV_hits.root
-/CaTS/Analysis/Filename proton_50GeV_analysis.root
+/CaTS/random/randomSeed 123456
+/CaTS/random/saveSeed false
+/CaTS/RootIO/Filename proton_3GeV_hits.root
+/CaTS/RootIO/HCMapBranch 1
+/CaTS/Analysis/Filename proton_3GeV_analysis.root
 # low time slices
-/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/TimeSliceLow 0.01 ns
-/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/TimeSliceLow 0.01 ns
-/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/MinTimeLow 0. ns
-/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/MinTimeLow 0. ns
-/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/MaxTimeLow 1. ns
-/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/MaxTimeLow 1. ns
+/CaTS/RunAction/TimeSliceSizeLow 0.010 ns
+/CaTS/RunAction/MinTimeLow 0. ns
+/CaTS/RunAction/MaxTimeLow 5. ns
 # medium time slices
-/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/TimeSliceMed 1 ns
-/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/TimeSliceMed 1 ns
-/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/MinTimeMed 0. ns
-/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/MinTimeMed 0. ns
-/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/MaxTimeMed 100. ns
-/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/MaxTimeMed 100. ns
+/CaTS/RunAction/TimeSliceSizeMed 0.2 ns
+/CaTS/RunAction/MinTimeMed   0. ns
+/CaTS/RunAction/MaxTimeMed 100. ns
 # high time slices
-/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/TimeSliceHig 100 ns
-/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/TimeSliceHig 100 ns
-/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/MinTimeHig 0. ns
-/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/MinTimeHig 0. ns
-/CaTS/SensitiveDetectors/AbsorberVol_DRTSCalorimeter/MaxTimeHig 10000. ns
-/CaTS/SensitiveDetectors/ScintillatorVol_DRTSCalorimeter/MaxTimeHig 10000. ns
+/CaTS/RunAction/TimeSliceSizeHig 10 ns
+/CaTS/RunAction/MinTimeHig    0. ns
+/CaTS/RunAction/MaxTimeHig 5000. ns
 # Shoot along various directions
 #/tracking/verbose 1
 /gun/direction 0. 0. 1.
 /gun/position 0. 0. 0. mm
 /gun/particle proton
-/gun/energy 50 GeV
+/gun/energy 3 GeV
 /run/beamOn 10
 exit

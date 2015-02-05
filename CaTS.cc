@@ -3,7 +3,7 @@
             )     (    
            =\     /=
              )===(
-            /     \         CaTS: Calorimeter and Tracker Simulation
+            /     \         Cats: Calorimeter and Tracker Simulation
             |     |         Author: Hans Wenzel (Fermilab)
            /       \
            \       /
@@ -61,11 +61,11 @@ int main(int argc, char **argv)
     return -1;
   }
   
-#ifdef G4ANALYSIS_USE
-  Analysis* pAnalysis = Analysis::getInstance();
-#endif
+  // #ifdef G4ANALYSIS_USE
+  //   Analysis* pAnalysis = Analysis::getInstance();
+  // #endif
   
-  
+    
   //Construct the default run manager
   G4RunManager * runManager = new G4RunManager();
   
@@ -102,14 +102,12 @@ int main(int argc, char **argv)
   //  Shielding
   //-----------------------------------------------------
   char* path = getenv("PHYSLIST");
-  if (path) {
-    physName = G4String(path);
-  } else {
-    //physName = "FTFP_BERT"; // default
-    physName = "QGSP_BERT"; // default
-  }
+  if( path ) physName = G4String(path);
+  else       physName = "FTFP_BERT";     // default
+  //else       physName = "QGSP_BERT_LIV"; // livermore
+  
   // reference PhysicsList via its name
-  if (factory.IsReferencePhysList(physName)) {
+  if( factory.IsReferencePhysList(physName) ) {
     phys = factory.GetReferencePhysList(physName);
   }
   
@@ -124,7 +122,7 @@ int main(int argc, char **argv)
   G4bool enable_optical = false;
   char* opticalphys = getenv("ENABLEOPTICAL");
   
-  if (opticalphys)
+  if( opticalphys )
   {
     enable_optical = true;
     G4OpticalPhysics* opticalPhysics = new G4OpticalPhysics();
@@ -172,15 +170,13 @@ int main(int argc, char **argv)
 #ifdef G4ANALYSIS_USE
   runManager->SetUserAction(StackingAction::getInstance());
 #endif
-
-// #ifdef G4ANALYSIS_USE
-//   Analysis* pAnalysis = Analysis::getInstance();
-// #endif
-// G4UImanager* UImanager = G4UImanager::GetUIpointer();
+  
+  // #ifdef G4ANALYSIS_USE
+  //   Analysis* pAnalysis = Analysis::getInstance();
+  // #endif
   runManager->Initialize();
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
-  RootIO* pRootIO = RootIO::GetInstance();
-
+  
 #ifdef G4VIS_USE
   G4VisManager* visManager = new G4VisExecutive;
   visManager->Initialize();
@@ -205,6 +201,7 @@ int main(int argc, char **argv)
   delete visManager;
 #endif
   delete runManager;
+  
   
   return 0;
 }
