@@ -1,6 +1,7 @@
 /CaTS/random/randomSeed 123456
 /CaTS/random/saveSeed false
 /CaTS/RootIO/Filename pi-_50GeV_hits.root
+/CaTS/RootIO/MapByPosBranch 1
 /CaTS/RootIO/HCMapBranch 1
 /CaTS/Analysis/Filename pi-_50GeV_analysis.root
 # low time slices
@@ -21,5 +22,5 @@
 /gun/position 0. 0. 0. mm
 /gun/particle pi-
 /gun/energy 50 GeV
-/run/beamOn 10
+/run/beamOn 1
 exit

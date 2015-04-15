@@ -27,7 +27,7 @@
 #ifdef G4ANALYSIS_USE
 #include "Analysis.hh"
 #include "EventAction.hh"
-#include "TH1.h"
+#include "TH1F.h"
 #endif
 
 class G4Step;

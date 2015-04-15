@@ -49,8 +49,7 @@
 #include <fstream>
 using namespace std;
 
-std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
-std::vector<std::string> split(const std::string &s, char delim);
+void GetProcessList(std::vector<G4String>* vec);
 bool FillChain(TChain* chain, const std::string& inputFileList);
 TH1F* GetCumulative(TProfile* prof, const int& normalize, const float& Eobs);
 
@@ -60,7 +59,7 @@ int main(int argc, char** argv)
 {
   if( argc < 3 )
   {
-    G4cout << "Program requires 3 arguments: input file list, base name of output file, HCMap (false)" << G4endl;
+    G4cout << "Program requires at least 2 arguments: input file list, base name of output file, maxEntries (-1), HCMap (false)" << G4endl;
     exit(1);
   }
   
@@ -96,10 +95,12 @@ int main(int argc, char** argv)
   //----------------------
   // loop over input files
   
-  int fileIt = 0;
+  G4int fileIt = 0;
   TFile* outFile;
+  G4int maxEntries = -1;
   G4bool doHCMap = false;
-  if( argc > 3 ) doHCMap = G4bool(atoi(argv[3]));
+  if( argc > 3 ) maxEntries = G4int(atoi(argv[3]));
+  if( argc > 4 ) doHCMap = G4bool(atoi(argv[4]));
   
   while(1)
   {
@@ -133,7 +134,8 @@ int main(int argc, char** argv)
     std::map<G4String,TDirectory*> VolumeDirsetTime;
     
     std::vector<G4String>* volumeList;
-    std::vector<G4String>* particleList;
+    std::vector<G4String>* particleList  = new std::vector<G4String>;
+    std::vector<G4String>* processList = new std::vector<G4String>;
     
     std::vector<G4String> timeTypes;
     timeTypes.push_back("globalTime");
@@ -156,16 +158,22 @@ int main(int argc, char** argv)
     std::map<G4String,TH1F*> h_Eobs;
     std::map<G4String,TH1F*> h_NCeren;
     
-    std::map<G4String,std::map<G4String,TProfile*> > Eobs_byTime;                               // map<volume,map<timeSliceName,TProfile*> >
-    std::map<G4String,std::map<G4String,std::map<G4String,TProfile*> > >Eobs_byParticleAndTime; // map<volume,map<timeSliceName,map<particle,TProfile*> > >
-    std::map<G4String,std::map<G4String,TProfile*> > EobsFrac_byTime;                               // map<volume,map<timeSliceName,TProfile*> >
-    std::map<G4String,std::map<G4String,std::map<G4String,TProfile*> > >EobsFrac_byParticleAndTime; // map<volume,map<timeSliceName,map<particle,TProfile*> > >
+    std::map<G4String,std::map<G4String,TProfile*> > nonZeroEobs_byTime;                                // map<volume,map<timeSliceName,TProfile*> >
+    std::map<G4String,std::map<G4String,std::map<G4String,TProfile*> > > nonZeroEobs_byParticleAndTime; // map<volume,map<timeSliceName,map<particle,TProfile*> > >
     
-    std::map<G4String,std::map<G4String,TProfile*> > Eobs_byTime_cumul;                               // map<volume,map<timeSliceName,TProfile*> >
-    std::map<G4String,std::map<G4String,std::map<G4String,TProfile*> > >Eobs_byParticleAndTime_cumul; // map<volume,map<timeSliceName,map<particle,TProfile*> > >
-    std::map<G4String,std::map<G4String,TProfile*> > EobsFrac_byTime_cumul;                               // map<volume,map<timeSliceName,TProfile*> >
-    std::map<G4String,std::map<G4String,std::map<G4String,TProfile*> > >EobsFrac_byParticleAndTime_cumul; // map<volume,map<timeSliceName,map<particle,TProfile*> > >
+    std::map<G4String,std::map<G4String,TProfile*> > Eobs_byTime;                                // map<volume,map<timeSliceName,TProfile*> >
+    std::map<G4String,std::map<G4String,std::map<G4String,TProfile*> > > Eobs_byParticleAndTime; // map<volume,map<timeSliceName,map<particle,TProfile*> > >
+    std::map<G4String,std::map<G4String,TProfile*> > EobsFrac_byTime;                                // map<volume,map<timeSliceName,TProfile*> >
+    std::map<G4String,std::map<G4String,std::map<G4String,TProfile*> > > EobsFrac_byParticleAndTime; // map<volume,map<timeSliceName,map<particle,TProfile*> > >
     
+    std::map<G4String,std::map<G4String,TProfile*> > Eobs_byTime_cumul;                                // map<volume,map<timeSliceName,TProfile*> >
+    std::map<G4String,std::map<G4String,std::map<G4String,TProfile*> > > Eobs_byParticleAndTime_cumul; // map<volume,map<timeSliceName,map<particle,TProfile*> > >
+    std::map<G4String,std::map<G4String,TProfile*> > EobsFrac_byTime_cumul;                                // map<volume,map<timeSliceName,TProfile*> >
+    std::map<G4String,std::map<G4String,std::map<G4String,TProfile*> > > EobsFrac_byParticleAndTime_cumul; // map<volume,map<timeSliceName,map<particle,TProfile*> > >
+    
+    std::map<G4String,std::map<G4String,std::map<G4String,TProfile*> > > mult_byProcessAndTime; // map<volume,map<timeSliceName,map<particle,TProfile*> > >
+    std::map<G4String,std::map<G4String,std::map<G4String,TProfile*> > > Etot_byProcessAndTime; // map<volume,map<timeSliceName,map<particle,TProfile*> > >
+    std::map<G4String,std::map<G4String,std::map<G4String,TProfile*> > > Ekin_byProcessAndTime; // map<volume,map<timeSliceName,map<particle,TProfile*> > >
     
     std::map<G4String,std::map<G4String,TProfile2D*> > Eobs_time_vs_z; // map<volume,map<timeSliceName,TProfile2D*> >
     std::map<G4String,std::map<G4String,TProfile2D*> > Eobs_time_vs_R; // map<volume,map<timeSliceName,TProfile2D*> >
@@ -194,6 +202,7 @@ int main(int argc, char** argv)
     volumeList = runHeader -> GetVolumes();
     volumeList->push_back("AllVol");
     particleList = runHeader -> GetParticleList();
+    GetProcessList(processList);
     
     timeSliceSizes["Low"] = runHeader->GetTimeSliceSizeLow();
     timeSliceSizes["Med"] = runHeader->GetTimeSliceSizeMed();
@@ -223,9 +232,9 @@ int main(int argc, char** argv)
       
       VolumeDirsetGlobal[volName]->cd();
       
-      h_Edep[volName] = new TH1F(Form("h_Edep%s",volName.c_str()), "Total energy deposited", 1000, 0., 1.1*Ein);
-      h_Eobs[volName] = new TH1F(Form("h_Eobs%s",volName.c_str()), "Total observed (Birks suppressed) energy", 1000, 0., 1.1*Ein);
-      h_NCeren[volName] = new TH1F(Form("h_NCeren%s",volName.c_str()), "Total nr. of cerenkov photons", 1000, 0., 65000*1.1*Ein);
+      h_Edep[volName]   = new TH1F(Form("h_Edep%s",volName.c_str()),   "Total energy deposited",                   1000, 0., std::max(1.1*Ein,0.05));
+      h_Eobs[volName]   = new TH1F(Form("h_Eobs%s",volName.c_str()),   "Total observed (Birks suppressed) energy", 1000, 0., std::max(1.1*Ein,0.05));
+      h_NCeren[volName] = new TH1F(Form("h_NCeren%s",volName.c_str()), "Total nr. of cerenkov photons",            1000, 0., 65000*1.1*Ein);
     }
     
     TDirectory* timeDir = outFile->mkdir("timeHistos");
@@ -240,6 +249,7 @@ int main(int argc, char** argv)
       {
         VolumeDirsetTime.insert(std::make_pair(volName,timeDir->mkdir(volName.c_str())));
         VolumeDirsetTime[volName]->mkdir("particleHistos");
+        VolumeDirsetTime[volName]->mkdir("processHistos");
       }
       
       for(unsigned int timeTypeIt = 0; timeTypeIt < timeTypes.size(); ++timeTypeIt)
@@ -255,6 +265,8 @@ int main(int argc, char** argv)
           G4float max = maxTimes[timeSliceType]+timeSliceSizes[timeSliceType];
           
           VolumeDirsetTime[volName]->cd();
+          
+          nonZeroEobs_byTime[volName][timeSliceName] = new TProfile(Form("nonZeroEobs%s_%s",    volName.c_str(),timeSliceName.c_str()),"Eobs",nBins,min,max,"s");
           
           Eobs_byTime[volName][timeSliceName]     = new TProfile(Form("Eobs%s_%s",    volName.c_str(),timeSliceName.c_str()),"Eobs",nBins,min,max,"s");
           EobsFrac_byTime[volName][timeSliceName] = new TProfile(Form("EobsFrac%s_%s",volName.c_str(),timeSliceName.c_str()),"Eobs",nBins,min,max,"s");
@@ -273,11 +285,27 @@ int main(int argc, char** argv)
             
             VolumeDirsetTime[volName]->cd("particleHistos");
             
+            nonZeroEobs_byParticleAndTime[volName][timeSliceName][partName] = new TProfile(Form("nonZeroEobs%s_%s_%s", volName.c_str(),partName.c_str(),timeSliceName.c_str()),"Eobs",nBins,min,max,"s");
+            
             Eobs_byParticleAndTime[volName][timeSliceName][partName]     = new TProfile(Form("Eobs%s_%s_%s",    volName.c_str(),partName.c_str(),timeSliceName.c_str()),"Eobs",nBins,min,max,"s");
             EobsFrac_byParticleAndTime[volName][timeSliceName][partName] = new TProfile(Form("EobsFrac%s_%s_%s",volName.c_str(),partName.c_str(),timeSliceName.c_str()),"Eobs",nBins,min,max,"s");
             
             Eobs_byParticleAndTime_cumul[volName][timeSliceName][partName]     = new TProfile(Form("Eobs%s_cumul_%s_%s",    volName.c_str(),partName.c_str(),timeSliceName.c_str()),"Eobs",nBins,min,max,"s");
             EobsFrac_byParticleAndTime_cumul[volName][timeSliceName][partName] = new TProfile(Form("EobsFrac%s_cumul_%s_%s",volName.c_str(),partName.c_str(),timeSliceName.c_str()),"Eobs",nBins,min,max,"s");
+          }
+          
+          VolumeDirsetTime[volName]->cd();
+          
+          for(unsigned int procIt = 0; procIt < processList->size(); ++procIt)
+          {
+            std::string procName = processList->at(procIt);
+            
+            VolumeDirsetTime[volName]->cd("processHistos");
+            
+            mult_byProcessAndTime[volName][timeSliceName][procName] = new TProfile(Form("mult%s_%s_%s",volName.c_str(),procName.c_str(),timeSliceName.c_str()),"mult",nBins,min,max,"s");
+            Etot_byProcessAndTime[volName][timeSliceName][procName] = new TProfile(Form("Etot%s_%s_%s",volName.c_str(),procName.c_str(),timeSliceName.c_str()),"Etot",nBins,min,max,"s");
+            Ekin_byProcessAndTime[volName][timeSliceName][procName] = new TProfile(Form("Ekin%s_%s_%s",volName.c_str(),procName.c_str(),timeSliceName.c_str()),"Ekin",nBins,min,max,
+"s");
           }
         }
       }
@@ -288,6 +316,7 @@ int main(int argc, char** argv)
     // loop over events
     
     G4int nEvents = Tevt->GetEntries();
+    if( maxEntries != -1 ) nEvents = maxEntries;
     //nEvents = 1;
     G4cout << "Nr. of Events:  " << nEvents << std::endl;
     for(G4int entry = 0; entry < nEvents; ++entry)
@@ -310,6 +339,8 @@ int main(int argc, char** argv)
       std::map<G4String,std::map<G4String,std::map<G4int,G4float> > >* m_Eobs_byTime   = event->GetEobsByTimeMap();   // map<Detector,map<timeSliceType,map<timeSlice,energy> > >
       //std::map<G4String,std::map<G4String,std::map<G4int,G4float> > >* m_NCeren_byTime = event->GetNCerenByTimeMap(); // map<Detector,map<timeSliceType,map<timeSlice,energy> > >
       std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > >* m_Eobs_byParticleAndTime = event->GetEobsByParticleAndTimeMap(); // map<Detector,map<timeSliceType,map<timeSlice,map<particle,energy> > > >
+      std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4int> > > >* m_mult_byProcessAndTime = event->GetProcessAndTimeMult(); // map<Detector,map<timeSliceType,map<timeSlice,map<processes,mult> > > >
+      std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4String,products> > > > >* m_products_byProcessAndTime = event->GetProcessAndTimeMap(); // map<Detector,map<timeSliceType,map<timeSlice,map<process,map< particle,products> > > > >
       std::map<G4String,std::map<G4String,std::map<G4ThreeVector,std::vector<G4VHit*> > > >* HCMap;
       if( doHCMap ) HCMap = event->GetHCMap();
       
@@ -334,7 +365,8 @@ int main(int argc, char** argv)
       }
       h_Edep["AllVol"]   -> Fill(sumEdep);
       h_Eobs["AllVol"]   -> Fill(sumEobs);
-      h_NCeren["AllVol"] -> Fill(sumNCeren);      
+      h_NCeren["AllVol"] -> Fill(sumNCeren);
+      
       
       
       //---------------------
@@ -353,7 +385,8 @@ int main(int argc, char** argv)
           G4float timeSliceSize = timeSliceSizes[timeSliceType];
           
           
-          // global and particle plots
+          //-----------------------------------
+          // global, particle and process plots
           std::map<G4String,G4float> sum;
           G4float sumAllVol = 0.;
           std::map<G4String,std::map<G4String,G4float> > sumPart;
@@ -362,12 +395,20 @@ int main(int argc, char** argv)
           {
             G4float time = min + (bin-1)*timeSliceSize + 0.5*timeSliceSize;
             G4float volSum = 0.;
+            G4float volSum2 = 0.;
+            G4float volMultSum = 0.;
             for(unsigned int volIt = 0; volIt < volumeList->size()-1; ++volIt)
             {
               G4String volName = volumeList->at(volIt);
               sum[volName] += (*m_Eobs_byTime)[volName][timeSliceName][bin];
               sumAllVol += (*m_Eobs_byTime)[volName][timeSliceName][bin];
               volSum += (*m_Eobs_byTime)[volName][timeSliceName][bin];
+              
+              if( (*m_Eobs_byTime)[volName][timeSliceName][bin] > 0. )
+                nonZeroEobs_byTime[volName][timeSliceName] -> Fill( time,(*m_Eobs_byTime)[volName][timeSliceName][bin] );
+              
+              Eobs_byTime[volName][timeSliceName]      -> Fill( time,(*m_Eobs_byTime)[volName][timeSliceName][bin] );
+              EobsFrac_byTime[volName][timeSliceName]  -> Fill( time,(*m_Eobs_byTime)[volName][timeSliceName][bin] / Eobs );
               
               Eobs_byTime[volName][timeSliceName]      -> Fill( time,(*m_Eobs_byTime)[volName][timeSliceName][bin] );
               EobsFrac_byTime[volName][timeSliceName]  -> Fill( time,(*m_Eobs_byTime)[volName][timeSliceName][bin] / Eobs );
@@ -393,6 +434,9 @@ int main(int argc, char** argv)
                 sumPartAllVol[partName] += (*m_Eobs_byParticleAndTime)[volName][timeSliceName][bin][partName];
                 volSum += (*m_Eobs_byParticleAndTime)[volName][timeSliceName][bin][partName];
                 
+                if( (*m_Eobs_byParticleAndTime)[volName][timeSliceName][bin][partName] > 0. )
+                  nonZeroEobs_byParticleAndTime[volName][timeSliceName][partName] -> Fill( time,(*m_Eobs_byParticleAndTime)[volName][timeSliceName][bin][partName] );
+                
                 Eobs_byParticleAndTime[volName][timeSliceName][partName]      -> Fill( time,(*m_Eobs_byParticleAndTime)[volName][timeSliceName][bin][partName] );
                 EobsFrac_byParticleAndTime[volName][timeSliceName][partName]  -> Fill( time,(*m_Eobs_byParticleAndTime)[volName][timeSliceName][bin][partName] / Eobs );
                 
@@ -406,9 +450,43 @@ int main(int argc, char** argv)
               Eobs_byParticleAndTime_cumul["AllVol"][timeSliceName][partName]     -> Fill( time,sumPartAllVol[partName] );
               EobsFrac_byParticleAndTime_cumul["AllVol"][timeSliceName][partName] -> Fill( time,sumPartAllVol[partName] / Eobs );
             }
-          }  
+            
+            for(unsigned int procIt = 0; procIt < processList->size(); ++procIt)
+            {
+              std::string procName = processList->at(procIt);
+              volSum = 0.;
+              volSum2 = 0.;
+              volMultSum = 0.;
+              for(unsigned int volIt = 0; volIt < volumeList->size()-1; ++volIt)
+              {
+                G4String volName = volumeList->at(volIt);
+                
+                std::map<G4String,products> tmpMap = (*m_products_byProcessAndTime)[volName][timeSliceName][bin][procName];
+                G4float tmpSum = 0.;
+                G4float tmpSum2 = 0.;
+                for(std::map<G4String,products>::const_iterator tmpMapIt = tmpMap.begin(); tmpMapIt != tmpMap.end(); ++tmpMapIt)
+                {
+                  tmpSum  += tmpMapIt->second.totE;
+                  tmpSum2 += tmpMapIt->second.kinE;
+                }
+                
+                volMultSum += (*m_mult_byProcessAndTime)[volName][timeSliceName][bin][procName];
+                volSum += tmpSum;
+                volSum2 += tmpSum2;
+                
+                mult_byProcessAndTime[volName][timeSliceName][procName] -> Fill( time,(*m_mult_byProcessAndTime)[volName][timeSliceName][bin][procName] );
+                Etot_byProcessAndTime[volName][timeSliceName][procName] -> Fill( time,tmpSum );
+                Ekin_byProcessAndTime[volName][timeSliceName][procName] -> Fill( time,tmpSum2 );
+              }
+              
+              mult_byProcessAndTime["AllVol"][timeSliceName][procName] -> Fill( time,volMultSum );
+              Etot_byProcessAndTime["AllVol"][timeSliceName][procName] -> Fill( time,volSum );
+              Ekin_byProcessAndTime["AllVol"][timeSliceName][procName] -> Fill( time,volSum2 );
+            }
+          }
           
           
+          //------------
           // HCMap plots
           if( doHCMap )
           {
@@ -445,9 +523,12 @@ int main(int argc, char** argv)
     } // end loop over events
     std::cout << "\n>>> loop over events done" << std::endl;
     
-    G4cout << "===========================================" << G4endl;
-    G4cout << "nr of MB written:  " << outFile -> Write()/1024/1024 << G4endl;
-    G4cout << "===========================================" << G4endl;
+    int bytes = outFile -> Write();
+    G4cout << "============================================"  << G4endl;
+    G4cout << "nr of  B written:  " << int(bytes)             << G4endl;
+    G4cout << "nr of KB written:  " << int(bytes/1024.)       << G4endl;
+    G4cout << "nr of MB written:  " << int(bytes/1024./1024.) << G4endl;
+    G4cout << "============================================" << G4endl;
     
     outFile -> Close();
     ++fileIt;
@@ -458,22 +539,6 @@ int main(int argc, char** argv)
   }
   
   G4cout << G4endl;
-}
-
-
-
-std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
-    std::stringstream ss(s);
-    std::string item;
-    while (std::getline(ss, item, delim)) {
-        elems.push_back(item);
-    }
-    return elems;
-}
-
-std::vector<std::string> split(const std::string &s, char delim) {
-    std::vector<std::string> elems;
-    return split(s, delim, elems);
 }
 
 
@@ -501,6 +566,66 @@ bool FillChain(TChain* chain, const std::string& inputFileList)
   }
   
   return true;
+}
+
+
+
+void GetProcessList(std::vector<G4String>* vec)
+{
+  vec -> push_back("alphaInelastic");
+  vec -> push_back("annihil");
+  vec -> push_back("anti-lambdaInelastic");
+  vec -> push_back("anti_neutronInelastic");
+  vec -> push_back("anti_omega-Inelastic");
+  vec -> push_back("anti_protonInelastic");
+  vec -> push_back("anti_sigma-Inelastic");
+  vec -> push_back("anti_sigma+Inelastic");
+  vec -> push_back("anti_xi0Inelastic");
+  vec -> push_back("anti_xi-Inelastic");
+  vec -> push_back("compt");
+  vec -> push_back("conv");
+  vec -> push_back("CoulombScat");
+  vec -> push_back("Decay");
+  vec -> push_back("dInelastic");
+  vec -> push_back("eBrem");
+  vec -> push_back("eIoni");
+  vec -> push_back("electronNuclear");
+  vec -> push_back("hadElastic");
+  vec -> push_back("hBertiniCaptureAtRest");
+  vec -> push_back("hBrems");
+  vec -> push_back("He3Inelastic");
+  vec -> push_back("hFritiofCaptureAtRest");
+  vec -> push_back("hIoni");
+  vec -> push_back("hPairProd");
+  vec -> push_back("ionInelastic");
+  vec -> push_back("ionIoni");
+  vec -> push_back("kaon0LInelastic");
+  vec -> push_back("kaon0SInelastic");
+  vec -> push_back("kaon-Inelastic");
+  vec -> push_back("kaon+Inelastic");
+  vec -> push_back("lambdaInelastic");
+  vec -> push_back("msc");
+  vec -> push_back("muBrems");
+  vec -> push_back("muIoni");
+  vec -> push_back("muMinusCaptureAtRest");
+  vec -> push_back("muonNuclear");
+  vec -> push_back("muPairProd");
+  vec -> push_back("nCapture");
+  vec -> push_back("neutronInelastic");
+  vec -> push_back("nKiller");
+  vec -> push_back("omega-Inelastic");
+  vec -> push_back("phot");
+  vec -> push_back("photonNuclear");
+  vec -> push_back("pi-Inelastic");
+  vec -> push_back("pi+Inelastic");
+  vec -> push_back("positronNuclear");
+  vec -> push_back("protonInelastic");
+  vec -> push_back("sigma-Inelastic");
+  vec -> push_back("sigma+Inelastic");
+  vec -> push_back("tInelastic");
+  vec -> push_back("Transportation");
+  vec -> push_back("xi0Inelastic");
+  vec -> push_back("xi-Inelastic");
 }
 
 

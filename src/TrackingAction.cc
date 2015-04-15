@@ -62,6 +62,11 @@ void TrackingAction::PostUserTrackingAction(const G4Track* aTrack)
       newTrackInfo -> SetParentInformation( aTrackInfo );
       newTrackInfo -> SetParticleProdTimeInformation( secTrack->GetGlobalTime()/picosecond );
       
+      // if(newTrackInfo->GetParticleName() == "mu-" || newTrackInfo->GetParticleName() == "mu+")
+      // {
+      //   G4cout << newTrackInfo->GetParticleName() << " FOUND from " << aTrackInfo->GetParticleName() << " at " << newTrackInfo->GetParticleProdTime()/1000 << G4endl;
+      // }
+      
       if( (aTrackInfo->GetParticleIsEM()) || 
           (newTrackInfo->GetParticleName() == "gamma" && aTrackInfo->GetParticleName() == "pi0") ||
           (newTrackInfo->GetParticleName() == "e-"    && aTrackInfo->GetParticleName() == "pi0") ||

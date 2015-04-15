@@ -44,6 +44,7 @@ private:
   G4UIdirectory* RootIODir;
   G4UIcmdWithAString* pFilenameCmd;
   G4UIcmdWithAnInteger* pBranchStatus1Cmd;
+  G4UIcmdWithAnInteger* pBranchStatus2Cmd;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

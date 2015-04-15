@@ -176,6 +176,7 @@ int main(int argc, char **argv)
   // #endif
   runManager->Initialize();
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
+  RootIO* pRootIO = RootIO::GetInstance();
   
 #ifdef G4VIS_USE
   G4VisManager* visManager = new G4VisExecutive;

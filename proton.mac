@@ -1,8 +1,9 @@
 /CaTS/random/randomSeed 123456
 /CaTS/random/saveSeed false
-/CaTS/RootIO/Filename proton_3GeV_hits.root
+/CaTS/RootIO/Filename proton_50GeV_hits.root
+/CaTS/RootIO/MapByPosBranch 1
 /CaTS/RootIO/HCMapBranch 1
-/CaTS/Analysis/Filename proton_3GeV_analysis.root
+/CaTS/Analysis/Filename proton_50GeV_analysis.root
 # low time slices
 /CaTS/RunAction/TimeSliceSizeLow 0.010 ns
 /CaTS/RunAction/MinTimeLow 0. ns
@@ -20,6 +21,6 @@
 /gun/direction 0. 0. 1.
 /gun/position 0. 0. 0. mm
 /gun/particle proton
-/gun/energy 3 GeV
-/run/beamOn 10
+/gun/energy 50 GeV
+/run/beamOn 1
 exit

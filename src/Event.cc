@@ -37,6 +37,10 @@ void Event::Reset()
   m_Eobs.clear();
   m_NCeren.clear();
   
+  m_Edep_byPos.clear();
+  m_Eobs_byPos.clear();
+  m_NCeren_byPos.clear();
+  
   m_Edep_byTime.clear();
   m_Eobs_byTime.clear();
   m_NCeren_byTime.clear();

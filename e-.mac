@@ -1,6 +1,7 @@
 /CaTS/random/randomSeed 123456
 /CaTS/random/saveSeed false
 /CaTS/RootIO/Filename e-_50GeV_hits.root
+/CaTS/RootIO/MapByPosBranch 1
 /CaTS/RootIO/HCMapBranch 1
 /CaTS/Analysis/Filename e-_50GeV_analysis.root
 # low time slices
@@ -16,7 +17,7 @@
 /CaTS/RunAction/MinTimeHig    0. ns
 /CaTS/RunAction/MaxTimeHig 5000. ns
 # Shoot along various directions
-/tracking/verbose 1
+#/tracking/verbose 1
 /gun/direction 0. 0. 1.
 /gun/position 0. 0. 0. mm
 /gun/particle e-

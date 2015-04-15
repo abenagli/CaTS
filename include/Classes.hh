@@ -40,6 +40,8 @@ std::vector<G4float> vf;
 std::map<G4String,G4float> sfMap;
 // energy by detector and time
 std::map<G4int,G4float> ifMap;
+std::map<G4ThreeVector,G4float> vfMap;
+std::map<G4String,std::map<G4ThreeVector,G4float> > svfMap;
 std::map<G4String,std::map<G4int,G4float> > sifMap;
 std::map<G4String,std::map<G4String,std::map<G4int,G4float> > > ssifMap;
 

@@ -17,8 +17,10 @@
     <class name="MyMainFrame"/>
     <!-- energy by detector -->
     <class name="std::map<G4String,G4float>"/>
-    <!-- energy by detector and time -->
+    <!-- energy by detector and position / time -->
     <class name="std::map<G4int,G4float>"/>
+    <class name="std::map<G4ThreeVector,G4float>"/>
+    <class name="std::map<G4String,std::map<G4ThreeVector,G4float> >"/>
     <class name="std::map<G4String,std::map<G4int,G4float> >"/>
     <class name="std::map<G4String,std::map<G4String,std::map<G4int,G4float> > >"/>
     <!-- energy by detector and particle -->

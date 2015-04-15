@@ -55,8 +55,14 @@ target_link_libraries(ClassesDict  ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex 
 add_executable(${name} ${name}.cc )
 target_link_libraries(${name} ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
+add_executable(getProcessList getProcessList.cc )
+target_link_libraries(getProcessList ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
+
 add_executable(readHits readHits.cc )
 target_link_libraries(readHits ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
+
+add_executable(studyEResVsSampling studyEResVsSampling.cc )
+target_link_libraries(studyEResVsSampling ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
 add_executable(drawShowerGUI drawShowerGUI.cc )
 target_link_libraries(drawShowerGUI ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
@@ -85,5 +91,5 @@ target_link_libraries(drawShowerGif ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRA
 #add_executable(response response.cc )
 #target_link_libraries(response ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
-install (TARGETS ${name} readHits drawShowerGUI drawShowerGif DESTINATION bin)
+install (TARGETS ${name} getProcessList readHits studyEResVsSampling drawShowerGUI drawShowerGif DESTINATION bin)
 install (TARGETS ${name} ClassesDict DESTINATION lib)
