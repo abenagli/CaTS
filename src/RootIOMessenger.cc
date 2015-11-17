@@ -68,6 +68,9 @@ void RootIOMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
     pRootIO -> SetBranchStatus("m_Edep_byPos",pBranchStatus1Cmd->GetNewIntValue(newValue));
     pRootIO -> SetBranchStatus("m_Eobs_byPos",pBranchStatus1Cmd->GetNewIntValue(newValue));
     pRootIO -> SetBranchStatus("m_NCeren_byPos",pBranchStatus1Cmd->GetNewIntValue(newValue));
+    pRootIO -> SetBranchStatus("m_Edep_byPosAndTime",pBranchStatus1Cmd->GetNewIntValue(newValue));
+    pRootIO -> SetBranchStatus("m_Eobs_byPosAndTime",pBranchStatus1Cmd->GetNewIntValue(newValue));
+    pRootIO -> SetBranchStatus("m_NCeren_byPosAndTime",pBranchStatus1Cmd->GetNewIntValue(newValue));
   }
   if( command == pBranchStatus2Cmd ){
     pRootIO -> SetBranchStatus("HCMap",pBranchStatus1Cmd->GetNewIntValue(newValue));

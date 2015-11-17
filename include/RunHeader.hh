@@ -51,6 +51,7 @@ private:
   G4int numZLayers;
   
   std::vector<G4String>* particleList;
+  std::vector<G4String>* particleTypeList;
   std::vector<G4String>* processList;
   
   G4float timeslicesizelow;
@@ -151,6 +152,10 @@ public:
   
   std::vector<G4String>* GetParticleList() {
     return particleList;
+  }
+  
+  std::vector<G4String>* GetParticleTypeList() {
+    return particleTypeList;
   }
   
   std::vector<G4String>* GetProcessList() {
@@ -273,11 +278,15 @@ public:
     std::sort(particleList->begin(),particleList->end());
   }
   
+  void SetParticleTypeList(std::vector<G4String>* vec) {
+    for(unsigned int it = 0; it < vec->size(); ++it) 
+      particleTypeList->push_back(vec->at(it));
+    std::sort(particleTypeList->begin(),particleTypeList->end());
+  }
+  
   void SetProcessList(std::vector<G4String>* vec) {
     for(unsigned int it = 0; it < vec->size(); ++it) 
-    {
       processList->push_back(vec->at(it));
-    }
     std::sort(processList->begin(),processList->end());
   }
   

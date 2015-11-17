@@ -42,6 +42,14 @@ void TrackingAction::PreUserTrackingAction(const G4Track* aTrack)
     
     delete aTrackInfo;
   }
+  
+  
+  TrackInformation* aTrackInfo = (TrackInformation*)( aTrack->GetUserInformation() );
+  
+  if( aTrackInfo->GetParticleName() == "neutron" )
+  {
+    aTrackInfo -> SetParticleIsNeutron();
+  }
 }
 
 
@@ -50,6 +58,7 @@ void TrackingAction::PostUserTrackingAction(const G4Track* aTrack)
 {
   TrackInformation* aTrackInfo = (TrackInformation*)( aTrack->GetUserInformation() );
   
+  //G4cout << "aTrackInfo::GetParticleName: " << aTrackInfo->GetParticleName() << G4endl;
   
   G4TrackVector* secondaries = fpTrackingManager->GimmeSecondaries();
   if( secondaries )
@@ -77,6 +86,13 @@ void TrackingAction::PostUserTrackingAction(const G4Track* aTrack)
       {
         newTrackInfo -> SetParentIsEM();
         newTrackInfo -> SetParticleIsEM();
+      }
+      
+      if( (aTrackInfo->GetParticleIsNeutron()) || 
+          (aTrackInfo->GetParticleName() == "neutron") )
+      {
+        newTrackInfo -> SetParentIsNeutron();
+        newTrackInfo -> SetParticleIsNeutron();
       }
       
       secTrack -> SetUserInformation( newTrackInfo );

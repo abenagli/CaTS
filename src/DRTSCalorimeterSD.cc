@@ -67,6 +67,7 @@ DRTSCalorimeterSD::DRTSCalorimeterSD(G4String name):
   timeSliceTypes.push_back("Hig");
   
   particleList = NULL;
+  particleTypeList = NULL;
   processList = NULL;
   
   instance = this;
@@ -93,8 +94,9 @@ void DRTSCalorimeterSD::Initialize(G4HCofThisEvent*)
     minTimes       = RA -> GetMinTimes();
     maxTimes       = RA -> GetMaxTimes();
     
-    particleList = RA -> GetParticleList();
-    processList  = RA -> GetProcessList();
+    particleList     = RA -> GetParticleList();
+    particleTypeList = RA -> GetParticleTypeList();
+    processList      = RA -> GetProcessList();
   }
   
 #ifdef G4ANALYSIS_USE
@@ -126,7 +128,7 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 {
   if( verbosity )
   {
-    G4cout << ">>> DRTSCalorimeterSD::ProcessHits <<<" << G4endl;
+    G4cout << ">>> DRTSCalorimeterSD::ProcessHits begin <<<" << G4endl;
   }
   
   EvtAction = EventAction::GetInstance();
@@ -230,6 +232,8 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   G4int NCerenPhotons = 0;
   G4String particleName = GetParticleName(theTrack);
   if( std::find(particleList->begin(),particleList->end(),particleName) == particleList->end() ) particleList->push_back(particleName);
+  G4String particleType = GetParticleType(theTrack);
+  if( std::find(particleTypeList->begin(),particleTypeList->end(),particleType) == particleTypeList->end() ) particleTypeList->push_back(particleType);
   G4String processName = (aStep->GetPostStepPoint()->GetProcessDefinedStep())->GetProcessName();
   if( std::find(processList->begin(),processList->end(),processName) == processList->end() ) processList->push_back(processName);
   G4StepPoint* pPreStepPoint = aStep->GetPreStepPoint();
@@ -246,10 +250,13 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
     NCerenPhotons = 0;
   }
   
+  G4float eesc = 0.;
+  if( particleName == "neutrino" && nStep == 1 )
+    eesc = theTrack->GetTotalEnergy() / CLHEP::GeV;
   
-  // // debug process
-  // if( processName == "Decay" ) verbosity = true;
-  // else verbosity = false;
+  G4float elos = 0.;
+  if( particleName == "proton_ev" && theTrack->GetKineticEnergy() == 0. )
+    elos = 0.008;
   
   
   // // debug muons
@@ -262,11 +269,9 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   // }
   // else verbosity = false;  
   
-  
   if( verbosity )
   {
-    TrackInformation* aTrackInfo = (TrackInformation*)( aStep->GetTrack()->GetUserInformation() );
-    G4cout << "isEM: " << aTrackInfo->GetParticleIsEM() << G4endl;
+    G4cout << "*** particleType: " << particleType << G4endl;
   }
   
   
@@ -284,12 +289,13 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
     G4cout << "//------------------------" << G4endl;
   }
   
-  
-  if( edep > 0. )
+  if( edep > 0. || eesc > 0. || elos > 0. )
   {
     //--------------------
     // global event energy
     
+    CaTSEvt->SetTotDepAndEscAndLosEnergy(CaTSEvt->GetTotDepAndEscAndLosEnergy() + edep + eesc + elos );
+    CaTSEvt->SetTotDepAndEscEnergy(CaTSEvt->GetTotDepAndEscEnergy() + edep + eesc );
     CaTSEvt->SetTotDepEnergy(CaTSEvt->GetTotDepEnergy() + edep);
     CaTSEvt->SetTotObsEnergy(CaTSEvt->GetTotObsEnergy() + eobs);
     CaTSEvt->SetTotNCeren(CaTSEvt->GetNCeren() + G4float(NCerenPhotons));
@@ -298,9 +304,13 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
     //----------------------------
     // event energy per sub-volume
     
+    std::map<G4String,G4float>* m_EdepAndEscAndLos = CaTSEvt->GetEdepAndEscAndLosMap();
+    std::map<G4String,G4float>* m_EdepAndEsc = CaTSEvt->GetEdepAndEscMap();
     std::map<G4String,G4float>* m_Edep = CaTSEvt->GetEdepMap();
     std::map<G4String,G4float>* m_Eobs = CaTSEvt->GetEobsMap();
     std::map<G4String,G4float>* m_NCeren = CaTSEvt->GetNCerenMap();
+    (*m_EdepAndEscAndLos)[SensitiveDetectorName] += (edep + eesc + elos);
+    (*m_EdepAndEsc)[SensitiveDetectorName] += (edep + eesc);
     (*m_Edep)[SensitiveDetectorName] += edep;
     (*m_Eobs)[SensitiveDetectorName] += eobs;
     (*m_NCeren)[SensitiveDetectorName] += NCerenPhotons;
@@ -317,8 +327,8 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
     (*m_NCeren_byPos)[SensitiveDetectorName][cellPosition] += NCerenPhotons;
     
     
-    //-------------------------------------------------
-    // event energy per sub-volume and particle/process
+    //-----------------------------------------
+    // event energy per sub-volume and particle
     
     std::map<G4String, std::map<G4String, G4float> >* m_Edep_byParticle = CaTSEvt->GetEdepByParticleMap();
     std::map<G4String, std::map<G4String, G4float> >* m_Eobs_byParticle = CaTSEvt->GetEobsByParticleMap();
@@ -326,7 +336,36 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
     (*m_Edep_byParticle)[SensitiveDetectorName][particleName] += edep;
     (*m_Eobs_byParticle)[SensitiveDetectorName][particleName] += eobs;
     (*m_NCeren_byParticle)[SensitiveDetectorName][particleName] += G4float(NCerenPhotons);
+    
+    
+    //----------------------------------------------
+    // event energy per sub-volume and particle type
+    
+    std::map<G4String, std::map<G4String, G4float> >* m_Edep_byParticleType = CaTSEvt->GetEdepByParticleTypeMap();
+    std::map<G4String, std::map<G4String, G4float> >* m_Eobs_byParticleType = CaTSEvt->GetEobsByParticleTypeMap();
+    std::map<G4String, std::map<G4String, G4float > >* m_NCeren_byParticleType = CaTSEvt->GetNCerenByParticleTypeMap();
+    (*m_Edep_byParticleType)[SensitiveDetectorName][particleType] += edep;
+    (*m_Eobs_byParticleType)[SensitiveDetectorName][particleType] += eobs;
+    (*m_NCeren_byParticleType)[SensitiveDetectorName][particleType] += G4float(NCerenPhotons);
   }
+  
+  
+  //------------------------
+  // detailed particle infos
+  
+  if( nStep == 1 )
+  {
+    std::map<G4String,std::map<G4String,G4int> >* particleMult = CaTSEvt -> GetParticleMult();
+    (*particleMult)[SensitiveDetectorName][particleName] += 1;
+    
+    std::map<G4String,std::map<G4String,TH1F*> >* particleHist = CaTSEvt -> GetParticleHist();
+    if( (*particleHist)[SensitiveDetectorName][particleName] == NULL )
+    {
+      (*particleHist)[SensitiveDetectorName][particleName] = new TH1F(Form("h_%s_%s",SensitiveDetectorName.c_str(),particleName.c_str()),"",100000,0.,1000.);
+    }
+    (*particleHist)[SensitiveDetectorName][particleName] -> Fill( aStep->GetTrack()->GetKineticEnergy() );
+  }
+  
   
   //-----------------------
   // detailed process infos
@@ -389,7 +428,10 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
       G4cout << ">>>>>> processName: " << processName
              << "   pname: " << pname
              << "   num: " << (*processMap)[SensitiveDetectorName][processName][pname].NParticles
-             << "   totE: " << (*processMap)[SensitiveDetectorName][processName][pname].totE/CLHEP::MeV
+             << "   kinE: " << (*secondary)[lp] -> GetKineticEnergy()
+             << "   totE: " << (*secondary)[lp] -> GetTotalEnergy()
+             << "   sum kinE: " << (*processMap)[SensitiveDetectorName][processName][pname].totE/CLHEP::MeV
+             << "   sum totE: " << (*processMap)[SensitiveDetectorName][processName][pname].totE/CLHEP::MeV
              << G4endl;
     }
   }
@@ -399,12 +441,12 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
   //--------------------
   // INFORMATION BY TIME
   //--------------------
-  if( verbosity )
-  {
-    G4cout << "//------------------------" << G4endl;
-    G4cout << "// INFORMATION BY TIME"     << G4endl;
-    G4cout << "//------------------------" << G4endl;
-  }
+  // if( verbosity )
+  // {
+  //   G4cout << "//------------------------" << G4endl;
+  //   G4cout << "// INFORMATION BY TIME"     << G4endl;
+  //   G4cout << "//------------------------" << G4endl;
+  // }
   
   for(std::map<G4String,G4float>::const_iterator mapIt = times.begin(); mapIt != times.end(); ++mapIt)
   {
@@ -434,8 +476,19 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
         (*m_NCeren_byTime)[SensitiveDetectorName][timeSliceName][timeSlice] += NCerenPhotons;
         
         
-        //-------------------------------------------------
-        // event energy per sub-volume and particle/process
+        //-----------------------------------------
+        // event energy per sub-volume and position
+        
+        std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4ThreeVector,G4float> > > >* m_Edep_byPosAndTime = CaTSEvt->GetEdepByPosAndTimeMap();
+        std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4ThreeVector,G4float> > > >* m_Eobs_byPosAndTime = CaTSEvt->GetEobsByPosAndTimeMap();
+        std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4ThreeVector,G4float> > > >* m_NCeren_byPosAndTime = CaTSEvt->GetNCerenByPosAndTimeMap();
+        (*m_Edep_byPosAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][cellPosition] += edep;
+        (*m_Eobs_byPosAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][cellPosition] += eobs;
+        (*m_NCeren_byPosAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][cellPosition] += NCerenPhotons;
+        
+        
+        //-----------------------------------------
+        // event energy per sub-volume and particle
         
         std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String, G4float> > > >* m_Edep_byParticleAndTime = CaTSEvt->GetEdepByParticleAndTimeMap();
         std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String, G4float> > > >* m_Eobs_byParticleAndTime = CaTSEvt->GetEobsByParticleAndTimeMap();
@@ -443,7 +496,24 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
         (*m_Edep_byParticleAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][particleName] += edep;
         (*m_Eobs_byParticleAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][particleName] += eobs;
         (*m_NCeren_byParticleAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][particleName] += G4float(NCerenPhotons);
+        
+        //----------------------------------------------
+        // event energy per sub-volume and particle type
+        
+        std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String, G4float> > > >* m_Edep_byParticleTypeAndTime = CaTSEvt->GetEdepByParticleTypeAndTimeMap();
+        std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String, G4float> > > >* m_Eobs_byParticleTypeAndTime = CaTSEvt->GetEobsByParticleTypeAndTimeMap();
+        std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String, G4float> > > >* m_NCeren_byParticleTypeAndTime = CaTSEvt->GetNCerenByParticleTypeAndTimeMap();
+        (*m_Edep_byParticleTypeAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][particleType] += edep;
+        (*m_Eobs_byParticleTypeAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][particleType] += eobs;
+        (*m_NCeren_byParticleTypeAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][particleType] += G4float(NCerenPhotons);
       }
+      
+      
+      //------------------------
+      // detailed particle infos
+      
+      std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4int > > > >* particleAndTimeMult = CaTSEvt -> GetParticleAndTimeMult();
+      (*particleAndTimeMult)[SensitiveDetectorName][timeSliceName][timeSlice][particleName] += 1;
       
       
       //----------------------
@@ -511,6 +581,14 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
     }
   }
   
+  
+  if( verbosity )
+  {
+    G4cout << ">>> DRTSCalorimeterSD::ProcessHits end <<<" << G4endl;
+    G4cout << G4endl;
+    G4cout << G4endl;
+  }
+  
   return true;
 }
 
@@ -528,6 +606,9 @@ G4String GetParticleName(G4Track* aTrack)
   if( particleName == "neutron" || particleName == "anti_neutron" )     partName = "neutron";
   if( particleName == "mu-"     || particleName == "mu+" )              partName = "mu";
   if( particleName == "pi+"     || particleName == "pi-" )              partName = "pi";
+  if( particleName == "nu_e"    || particleName == "anti_nu_e" )        partName = "neutrino";
+  if( particleName == "nu_mu"   || particleName == "anti_nu_mu" )       partName = "neutrino";
+  if( particleName == "nu_tau"  || particleName == "anti_nu_tau" )      partName = "neutrino";
   if( particleName == "e-"      || particleName == "e+" )               partName = particleName;
   if( particleName == "gamma" )                                         partName = particleName;
   
@@ -546,4 +627,19 @@ G4String GetParticleName(G4Track* aTrack)
   if( verbosity && partName == "other" ) G4cout << "!!! " << particleName << " saved as 'other'" << G4endl;
   
   return partName;
+}
+
+
+
+G4String GetParticleType(G4Track* aTrack)
+{
+  TrackInformation* aTrackInfo = (TrackInformation*)( aTrack->GetUserInformation() );
+  G4String partType = "";
+  
+  if(       aTrackInfo->GetParticleIsEM() && !aTrackInfo->GetParticleIsNeutron() ) partType = "em";
+  else if( !aTrackInfo->GetParticleIsEM() &&  aTrackInfo->GetParticleIsNeutron() ) partType = "neutron";
+  else if(  aTrackInfo->GetParticleIsEM() &&  aTrackInfo->GetParticleIsNeutron() ) partType = "undefined";
+  else                                                                             partType = "charged";
+  
+  return partType;
 }

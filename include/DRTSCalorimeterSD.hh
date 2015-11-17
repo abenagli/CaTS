@@ -36,6 +36,7 @@ class Cerenkov;
 class DRTSCalorimeterSDMessenger;
 
 G4String GetParticleName(G4Track* aTrack);
+G4String GetParticleType(G4Track* aTrack);
 
 
 
@@ -82,6 +83,7 @@ private:
   DRTSCalorimeterSDMessenger* pMessenger;
   
   std::vector<G4String>* particleList;
+  std::vector<G4String>* particleTypeList;
   std::vector<G4String>* processList;
   
 #ifdef G4ANALYSIS_USE

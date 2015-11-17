@@ -25,6 +25,8 @@
 #include "TrackerHit.hh"
 #include "MyMainFrame.hh"
 
+#include "TH1F.h"
+
 Event ev;
 RunHeader runh;
 products pr;
@@ -41,6 +43,9 @@ std::map<G4String,G4float> sfMap;
 // energy by detector and time
 std::map<G4int,G4float> ifMap;
 std::map<G4ThreeVector,G4float> vfMap;
+std::map<G4int,std::map<G4ThreeVector,G4float> > ivfMap;
+std::map<G4String,std::map<G4int,std::map<G4ThreeVector,G4float> > > sivfMap;
+std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4ThreeVector,G4float> > > > ssivfMap;
 std::map<G4String,std::map<G4ThreeVector,G4float> > svfMap;
 std::map<G4String,std::map<G4int,G4float> > sifMap;
 std::map<G4String,std::map<G4String,std::map<G4int,G4float> > > ssifMap;
@@ -52,9 +57,16 @@ std::map<G4int,std::map<G4String,G4float> > isfMap;
 std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > sisfMap;
 std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > > ssisfMap;
 
+// particle multiplicity
+std::map<G4String,TH1F*> shMap;
+std::map<G4String,std::map<G4String,TH1F*> > sshMap;
 // process multiplicity
 std::map<G4String,G4int> siMap;
 std::map<G4String,std::map<G4String,G4int> > ssiMap;
+// particle multiplicity and time
+std::map<G4int,std::map<G4String,TH1F*> > ishMap;
+std::map<G4String,std::map<G4int,std::map<G4String,TH1F*> > > sishMap;
+std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,TH1F*> > > > ssishMap;
 // process multiplicity and time
 std::map<G4int,std::map<G4String,G4int> > isiMap;
 std::map<G4String,std::map<G4int,std::map<G4String,G4int> > > sisiMap;

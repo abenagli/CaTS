@@ -17,6 +17,7 @@ TrackInformation::TrackInformation()
   particleProdTime = 0.;
   particleTime = 0.;
   particleIsEM = false;
+  particleIsNeutron = false;
   
   parentDefinition = 0;
   parentName = "";
@@ -26,6 +27,7 @@ TrackInformation::TrackInformation()
   parentEnergy = 0.;
   parentTime = 0.;
   parentIsEM = false;
+  parentIsNeutron = false;
 }
 
 
@@ -40,6 +42,7 @@ TrackInformation::TrackInformation(const G4Track* aTrack)
   particleEnergy = aTrack->GetTotalEnergy();
   particleTime = aTrack->GetGlobalTime();
   particleIsEM = false;
+  particleIsNeutron = false;
   
   parentDefinition = aTrack->GetDefinition();
   parentName = aTrack->GetDefinition()->GetParticleName();
@@ -49,6 +52,7 @@ TrackInformation::TrackInformation(const G4Track* aTrack)
   parentEnergy = aTrack->GetTotalEnergy();
   parentTime = aTrack->GetGlobalTime();
   parentIsEM = false;
+  parentIsNeutron = false;
 }
 
 
@@ -64,6 +68,7 @@ TrackInformation::TrackInformation(const TrackInformation* aTrackInfo)
   particleProdTime = aTrackInfo->particleProdTime;
   particleTime = aTrackInfo->particleTime;
   particleIsEM = aTrackInfo->particleIsEM;
+  particleIsNeutron = aTrackInfo->particleIsNeutron;
   
   parentDefinition = aTrackInfo->parentDefinition;
   parentName = aTrackInfo->parentName;
@@ -73,6 +78,7 @@ TrackInformation::TrackInformation(const TrackInformation* aTrackInfo)
   parentEnergy = aTrackInfo->parentEnergy;
   parentTime = aTrackInfo->parentTime;
   parentIsEM = aTrackInfo->parentIsEM;
+  parentIsNeutron = aTrackInfo->parentIsNeutron;
 }
 
 
@@ -87,6 +93,7 @@ void TrackInformation::SetParticleInformation(const TrackInformation* aTrackInfo
   particleEnergy = aTrackInfo->particleEnergy;
   particleTime = aTrackInfo->particleTime;
   if( aTrackInfo->GetParentIsEM() ) particleIsEM = true;
+  if( aTrackInfo->GetParentIsNeutron() ) particleIsNeutron = true;
 }
 
 
@@ -101,6 +108,7 @@ void TrackInformation::SetParentInformation(const TrackInformation* aTrackInfo)
   parentEnergy = aTrackInfo->particleEnergy;
   parentTime = aTrackInfo->particleTime;
   parentIsEM = aTrackInfo->particleIsEM;
+  parentIsNeutron = aTrackInfo->particleIsNeutron;
 }
 
 

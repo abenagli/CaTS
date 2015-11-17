@@ -62,6 +62,7 @@ private:
   std::map<G4String,G4float> maxTimes;
   
   std::vector<G4String>* particleList;
+  std::vector<G4String>* particleTypeList;
   std::vector<G4String>* processList;
   
   static PrimaryGeneratorAction* pgA; // pointer to the particle source 
@@ -93,8 +94,9 @@ public:
   std::map<G4String,G4float> GetMinTimes()       { return       minTimes; };
   std::map<G4String,G4float> GetMaxTimes()       { return       maxTimes; };
   
-  std::vector<G4String>* GetParticleList() { return particleList; };
-  std::vector<G4String>* GetProcessList()  { return processList;  };
+  std::vector<G4String>* GetParticleList()     { return particleList; };
+  std::vector<G4String>* GetParticleTypeList() { return particleTypeList; };
+  std::vector<G4String>* GetProcessList()      { return processList;  };
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -37,6 +37,7 @@ RunAction::RunAction(G4String gf, G4String pl, G4bool eo, G4bool es)
 {
   pMessenger = new RunActionMessenger(this);
   particleList = new std::vector<G4String>;
+  particleTypeList = new std::vector<G4String>;
   processList = new std::vector<G4String>;
   gdmlFile = gf;
   PhysicsList = pl;
@@ -107,7 +108,14 @@ void RunAction::EndOfRunAction(const G4Run* aRun)
 {
   RunHeader* RH = RunHeader::getInstance();
   
+  G4cout << "EndOfRunAction" << G4endl;
+  G4cout << "particleList: " << particleList->at(0) << G4endl;
+  G4cout << "particleTypeList: " << particleTypeList->at(0) << G4endl;
+  G4cout << "processList: " << processList->at(0) << G4endl;
+  G4cout << "EndOfRunAction" << G4endl;
+  
   RH->SetParticleList(particleList);
+  RH->SetParticleTypeList(particleTypeList);
   RH->SetProcessList(processList);
   RH->SetTimeSliceSizeLow(timeSliceSizes["Low"]);
   RH->SetMinTimeLow(minTimes["Low"]);

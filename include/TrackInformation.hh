@@ -35,6 +35,7 @@ private:
   G4double              particleProdTime;
   G4double              particleTime;
   G4bool                particleIsEM;
+  G4bool                particleIsNeutron;
   
   G4ParticleDefinition* parentDefinition;
   G4String              parentName;
@@ -44,6 +45,7 @@ private:
   G4double              parentEnergy;
   G4double              parentTime;
   G4bool                parentIsEM;
+  G4bool                parentIsNeutron;
   
 public:
   inline G4ParticleDefinition* GetParticleDefinintion() const { return particleDefinition; };
@@ -55,6 +57,7 @@ public:
   inline G4double GetParticleProdTime()                 const { return particleProdTime; };
   inline G4double GetParticleTime()                     const { return particleTime; };
   inline G4bool GetParticleIsEM()                       const { return particleIsEM; };
+  inline G4bool GetParticleIsNeutron()                  const { return particleIsNeutron; };
   
   inline G4ParticleDefinition* GetParentDefinintion() const { return parentDefinition; };
   inline G4String GetParentName()                     const { return parentName; };
@@ -64,10 +67,13 @@ public:
   inline G4double GetParentEnergy()                   const { return parentEnergy; };
   inline G4double GetParentTime()                     const { return parentTime; };
   inline G4double GetParentIsEM()                     const { return parentIsEM; };
+  inline G4double GetParentIsNeutron()                const { return parentIsNeutron; };
   
   inline void SetParticleProdTimeInformation(const G4double& prodTime) { particleProdTime = prodTime; };
   inline void SetParticleIsEM() { particleIsEM = true; };
   inline void SetParentIsEM() { parentIsEM = true; };
+  inline void SetParticleIsNeutron() { particleIsNeutron = true; };
+  inline void SetParentIsNeutron() { parentIsNeutron = true; };
   
   void SetParticleInformation(const TrackInformation* aTrackInfo);
   void SetParentInformation(const TrackInformation* aTrackInfo);
