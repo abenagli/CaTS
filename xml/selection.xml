@@ -21,6 +21,9 @@
     <class name="std::map<G4int,G4float>"/>
     <class name="std::map<G4ThreeVector,G4float>"/>
     <class name="std::map<G4String,std::map<G4ThreeVector,G4float> >"/>
+    <class name="std::map<G4int,std::map<G4ThreeVector,G4float> >"/>
+    <class name="std::map<G4String,std::map<G4int,std::map<G4ThreeVector,G4float> > >"/>
+    <class name="std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4ThreeVector,G4float> > > >"/>
     <class name="std::map<G4String,std::map<G4int,G4float> >"/>
     <class name="std::map<G4String,std::map<G4String,std::map<G4int,G4float> > >"/>
     <!-- energy by detector and particle -->
@@ -29,9 +32,16 @@
     <class name="std::map<G4int,std::map<G4String,G4float> >"/>
     <class name="std::map<G4String,std::map<G4int,std::map<G4String,G4float> > >"/>
     <class name="std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > >"/>
+    <!-- particle multiplicity -->
+    <class name="std::map<G4String,TH1F*>"/>
+    <class name="std::map<G4String,std::map<G4String,TH1F*> >"/>
     <!-- process multiplicity -->
     <class name="std::map<G4String,G4int>"/>
     <class name="std::map<G4String,std::map<G4String,G4int> >"/>
+    <!-- particle multiplicity and time -->
+    <class name="std::map<G4int,std::map<G4String,TH1F*> >"/>
+    <class name="std::map<G4String,std::map<G4int,std::map<G4String,TH1F*> > >"/>
+    <class name="std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,TH1F*> > > >"/>
     <!-- process multiplicity and time -->
     <class name="std::map<G4int,std::map<G4String,G4int> >"/>
     <class name="std::map<G4String,std::map<G4int,std::map<G4String,G4int> > >"/>

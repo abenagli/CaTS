@@ -101,6 +101,13 @@ int main(int argc, char** argv)
     
     RunHeader* runHeader = new RunHeader();
     TBranch* b_runHeader = Trh -> GetBranch("RunHeader");
+    
+    if( !Trh->GetListOfBranches()->FindObject("RunHeader") )
+    {
+      std::cout << ">>> RunHeader not found <<<" << std::endl;
+      continue;
+    }
+    
     b_runHeader -> SetAddress(&runHeader);
     
     std::vector<G4String>* processList;

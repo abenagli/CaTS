@@ -103,7 +103,8 @@ int main(int argc, char **argv)
   //-----------------------------------------------------
   char* path = getenv("PHYSLIST");
   if( path ) physName = G4String(path);
-  else       physName = "FTFP_BERT";     // default
+  else       physName = "QGSP_BERT_HP";    // default
+  //else       physName = "FTFP_BERT";     // FTFP
   //else       physName = "QGSP_BERT_LIV"; // livermore
   
   // reference PhysicsList via its name

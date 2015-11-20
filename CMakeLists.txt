@@ -61,6 +61,15 @@ target_link_libraries(getProcessList ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBR
 add_executable(readHits readHits.cc )
 target_link_libraries(readHits ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
+add_executable(readHits_light readHits_light.cc )
+target_link_libraries(readHits_light ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
+
+add_executable(timeResolution timeResolution.cc )
+target_link_libraries(timeResolution ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
+
+add_executable(dualReadout dualReadout.cc )
+target_link_libraries(dualReadout ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
+
 add_executable(studyEResVsSampling studyEResVsSampling.cc )
 target_link_libraries(studyEResVsSampling ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
@@ -91,5 +100,5 @@ target_link_libraries(drawShowerGif ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRA
 #add_executable(response response.cc )
 #target_link_libraries(response ClassesDict ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Cintex)
 
-install (TARGETS ${name} getProcessList readHits studyEResVsSampling drawShowerGUI drawShowerGif DESTINATION bin)
+install (TARGETS ${name} getProcessList readHits readHits_light timeResolution dualReadout studyEResVsSampling drawShowerGUI drawShowerGif DESTINATION bin)
 install (TARGETS ${name} ClassesDict DESTINATION lib)

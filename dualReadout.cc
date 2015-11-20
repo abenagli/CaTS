@@ -150,6 +150,14 @@ int main(int argc, char** argv)
     TBranch* b_event = Tevt -> GetBranch("Event");
     b_event -> SetAddress(&event);
     
+    Tevt -> SetBranchStatus("*",0);
+    Tevt -> SetBranchStatus("TotObsEnergy",1);
+    Tevt -> SetBranchStatus("TotNCeren",1);
+    Tevt -> SetBranchStatus("m_Edep",1);
+    Tevt -> SetBranchStatus("m_Eobs",1);
+    Tevt -> SetBranchStatus("m_NCeren",1);
+    Tevt -> SetBranchStatus("m_Edep_byTime",1);
+    
     RunHeader* runHeader = new RunHeader();
     TBranch* b_runHeader = Trh -> GetBranch("RunHeader");
     b_runHeader -> SetAddress(&runHeader);
@@ -333,7 +341,7 @@ int main(int argc, char** argv)
       G4cout << "Nr. of Events:  " << nEvents << std::endl;
       for(G4int entry = 0; entry < nEvents; ++entry)
       {
-        std::cout << ">>> processing event " << entry << " / " << nEvents << "\r" << std::flush;
+        std::cout << ">>> loop 1) processing event " << entry << " / " << nEvents << "\r" << std::flush;
         Tevt -> GetEntry(entry);
         
         
@@ -383,43 +391,43 @@ int main(int argc, char** argv)
         //---------------------
         // time dependent plots      
         
-        for(unsigned int volIt = 0; volIt < volumeList->size()-1; ++volIt)
-        {
-          G4String volName = volumeList->at(volIt);
+         for(unsigned int volIt = 0; volIt < volumeList->size()-1; ++volIt)
+         {
+           G4String volName = volumeList->at(volIt);
           
-          for(unsigned int timeTypeIt = 0; timeTypeIt < timeTypes.size(); ++timeTypeIt)
-          {
-            G4String timeType = timeTypes.at(timeTypeIt);
-            G4String timeSliceName = timeType + "Low";
+           for(unsigned int timeTypeIt = 0; timeTypeIt < timeTypes.size(); ++timeTypeIt)
+           {
+             G4String timeType = timeTypes.at(timeTypeIt);
+             G4String timeSliceName = timeType + "Low";
             
             
-            // sum Eobs
-            float EobsMaxTime = 0.;
-            std::map<float,float> EobsIntTime;
-            for(int bin = 1; bin <= nTimeSlices["Low"]+1; ++bin)
-            {
-              EobsMaxTime += (*m_Edep_byTime)[volName][timeSliceName][bin];
+             // sum Eobs
+             float EobsMaxTime = 0.;
+             std::map<float,float> EobsIntTime;
+             for(int bin = 1; bin <= nTimeSlices["Low"]+1; ++bin)
+             {
+               EobsMaxTime += (*m_Edep_byTime)[volName][timeSliceName][bin];
               
-              for(unsigned int intTimeIt = 0; intTimeIt < intTimeVals.size(); ++intTimeIt)
-              {
-                G4float intTime = intTimeVals.at(intTimeIt);
+               for(unsigned int intTimeIt = 0; intTimeIt < intTimeVals.size(); ++intTimeIt)
+               {
+                 G4float intTime = intTimeVals.at(intTimeIt);
                 
-                if( minTimes["Low"]+(bin-1)*timeSliceSizes["Low"] < intTime )
-                  EobsIntTime[intTime] += (*m_Edep_byTime)[volName][timeSliceName][bin];
-              }
-            }
+                 if( minTimes["Low"]+(bin-1)*timeSliceSizes["Low"] < intTime )
+                   EobsIntTime[intTime] += (*m_Edep_byTime)[volName][timeSliceName][bin];
+               }
+             }
             
             
-            // fill histo
-            for(unsigned int intTimeIt = 0; intTimeIt < intTimeVals.size(); ++intTimeIt)
-            {
-              G4float intTime = intTimeVals.at(intTimeIt);
+             // fill histo
+             for(unsigned int intTimeIt = 0; intTimeIt < intTimeVals.size(); ++intTimeIt)
+             {
+               G4float intTime = intTimeVals.at(intTimeIt);
               
-              h2_EobsMaxTime_vs_EobsIntTime[volName][timeSliceName][intTime] -> Fill( EobsIntTime[intTime]/EobsMaxTime,EobsMaxTime/Ein );
-              p_EobsMaxTime_vs_EobsIntTime[volName][timeSliceName][intTime] -> Fill( EobsIntTime[intTime]/EobsMaxTime,EobsMaxTime/Ein );
-            }
-          }
-        }
+               h2_EobsMaxTime_vs_EobsIntTime[volName][timeSliceName][intTime] -> Fill( EobsIntTime[intTime]/EobsMaxTime,EobsMaxTime/Ein );
+               p_EobsMaxTime_vs_EobsIntTime[volName][timeSliceName][intTime] -> Fill( EobsIntTime[intTime]/EobsMaxTime,EobsMaxTime/Ein );
+             }
+           }
+         }
         
       } // end loop over events
       std::cout << "\n>>> loop over events done" << std::endl;
@@ -476,7 +484,7 @@ int main(int argc, char** argv)
       G4cout << "Nr. of Events:  " << nEvents << std::endl;
       for(G4int entry = 0; entry < nEvents; ++entry)
       {
-        std::cout << ">>> processing event " << entry << " / " << nEvents << "\r" << std::flush;
+        std::cout << ">>> loop 2) processing event " << entry << " / " << nEvents << "\r" << std::flush;
         Tevt -> GetEntry(entry);
         
         
