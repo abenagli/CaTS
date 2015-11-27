@@ -48,6 +48,18 @@ RootIOMessenger::RootIOMessenger(RootIO* pR):
   pBranchStatus3Cmd->SetParameterName("status", false);
   pBranchStatus3Cmd->SetDefaultValue(1);
   pBranchStatus3Cmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+
+  pBranchStatus4Cmd = new G4UIcmdWithAnInteger("/CaTS/RootIO/MapByParticleBranches", this);
+  pBranchStatus4Cmd->SetGuidance("activate / deactivate branches by particle");
+  pBranchStatus4Cmd->SetParameterName("status", false);
+  pBranchStatus4Cmd->SetDefaultValue(1);
+  pBranchStatus4Cmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+
+  pBranchStatus5Cmd = new G4UIcmdWithAnInteger("/CaTS/RootIO/MapByProcessBranches", this);
+  pBranchStatus5Cmd->SetGuidance("activate / deactivate branches by process");
+  pBranchStatus5Cmd->SetParameterName("status", false);
+  pBranchStatus5Cmd->SetDefaultValue(1);
+  pBranchStatus5Cmd->AvailableForStates(G4State_PreInit, G4State_Idle);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -59,6 +71,9 @@ RootIOMessenger::~RootIOMessenger()
   delete pFilenameCmd;
   delete pBranchStatus1Cmd;
   delete pBranchStatus2Cmd;
+  delete pBranchStatus3Cmd;
+  delete pBranchStatus4Cmd;
+  delete pBranchStatus5Cmd;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -94,6 +109,21 @@ void RootIOMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
     pRootIO -> SetBranchStatus("m_Edep_byPosAndParticleAndTime",pBranchStatus3Cmd->GetNewIntValue(newValue));
     pRootIO -> SetBranchStatus("m_Edep_byPosAndParticleTypeAndTime",pBranchStatus3Cmd->GetNewIntValue(newValue));
   }
+
+  if( command == pBranchStatus4Cmd ){
+    pRootIO -> SetBranchStatus("m_Edep_byParticle",pBranchStatus4Cmd->GetNewIntValue(newValue));
+    pRootIO -> SetBranchStatus("m_Edep_byPosAndParticle",pBranchStatus4Cmd->GetNewIntValue(newValue));
+    pRootIO -> SetBranchStatus("m_Edep_byParticleAndTime",pBranchStatus4Cmd->GetNewIntValue(newValue));
+    pRootIO -> SetBranchStatus("m_Edep_byPosAndParticleAndTime",pBranchStatus4Cmd->GetNewIntValue(newValue));
+
+  }
+
+  if( command == pBranchStatus5Cmd ){
+    pRootIO -> SetBranchStatus("processMap",pBranchStatus5Cmd->GetNewIntValue(newValue));
+    pRootIO -> SetBranchStatus("processAndTimeMap",pBranchStatus5Cmd->GetNewIntValue(newValue));
+  }
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+

@@ -46,6 +46,8 @@ private:
   G4UIcmdWithAnInteger* pBranchStatus1Cmd;
   G4UIcmdWithAnInteger* pBranchStatus2Cmd;
   G4UIcmdWithAnInteger* pBranchStatus3Cmd;
+  G4UIcmdWithAnInteger* pBranchStatus4Cmd;
+  G4UIcmdWithAnInteger* pBranchStatus5Cmd;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

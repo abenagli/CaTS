@@ -4,6 +4,8 @@
 /CaTS/RootIO/MapByPosBranch 1
 /CaTS/RootIO/HCMapBranch 0
 /CaTS/RootIO/EdepBranches 0
+/CaTS/RootIO/MapByParticleBranches 0
+/CaTS/RootIO/MapByProcessBranches 0
 /CaTS/Analysis/Filename pi-_50GeV_analysis.root
 # low time slices
 /CaTS/RunAction/TimeSliceSizeLow 0.010 ns
