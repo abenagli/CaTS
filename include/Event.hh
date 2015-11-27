@@ -80,6 +80,21 @@ private:
   std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > > m_NCeren_byParticleTypeAndTime; // map<Detector,map<timeSliceType,map<timeSlice,map<particleType,energy> > > >
   
   
+  std::map<G4String,std::map<G4String,std::map<G4ThreeVector,G4float> > > m_Edep_byPosAndParticle;   // map<Detector,map<position,energy> >
+  std::map<G4String,std::map<G4String,std::map<G4ThreeVector,G4float> > > m_Eobs_byPosAndParticle;   // map<Detector,map<position,energy> >
+  std::map<G4String,std::map<G4String,std::map<G4ThreeVector,G4float> > > m_NCeren_byPosAndParticle; // map<Detector,map<position,energy> >
+  std::map<G4String,std::map<G4String,std::map<G4ThreeVector,G4float> > > m_Edep_byPosAndParticleType;   // map<Detector,map<position,energy> >
+  std::map<G4String,std::map<G4String,std::map<G4ThreeVector,G4float> > > m_Eobs_byPosAndParticleType;   // map<Detector,map<position,energy> >
+  std::map<G4String,std::map<G4String,std::map<G4ThreeVector,G4float> > > m_NCeren_byPosAndParticleType; // map<Detector,map<position,energy> >
+  
+  std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > > > m_Edep_byPosAndParticleAndTime;   // map<Detector,map<position,energy> >
+  std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > > > m_Eobs_byPosAndParticleAndTime;   // map<Detector,map<position,energy> >
+  std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > > > m_NCeren_byPosAndParticleAndTime; // map<Detector,map<position,energy> >
+  std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > > > m_Edep_byPosAndParticleTypeAndTime;   // map<Detector,map<position,energy> >
+  std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > > > m_Eobs_byPosAndParticleTypeAndTime;   // map<Detector,map<position,energy> >
+  std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > > > m_NCeren_byPosAndParticleTypeAndTime; // map<Detector,map<position,energy> >
+  
+  
   std::map<G4String,std::map<G4String,G4int> > m_particleMult;   // map<Detector,map<particle,mult> >
   std::map<G4String,std::map<G4String,TH1F*> > m_particleHist;   // map<Detector,map<particle,TH1F*> >
   
@@ -92,6 +107,7 @@ private:
   
   std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4int> > > > processAndTimeMult;                       // map<Detector,map<timeSliceType,map<timeSlice,map<processes,mult> > > >
   std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4String,products> > > > > processAndTimeMap; // map<Detector,map<timeSliceType,map<timeSlice,map<process,map< particle,products> > > > >
+  
   
   
   std::map<G4String,std::map<G4String,std::map<G4ThreeVector,std::vector<G4VHit*> > > > HCMap; // map<Detector,map<timeSliceType,map<position,hit> > >
@@ -155,6 +171,21 @@ public:
   std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > >* GetEdepByParticleTypeAndTimeMap()   { return &m_Edep_byParticleTypeAndTime;   };
   std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > >* GetEobsByParticleTypeAndTimeMap()   { return &m_Eobs_byParticleTypeAndTime;   };
   std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > >* GetNCerenByParticleTypeAndTimeMap() { return &m_NCeren_byParticleTypeAndTime; };
+  
+  
+  std::map<G4String,std::map<G4String,std::map<G4ThreeVector,G4float> > >* GetEdepByPosAndParticleMap()   { return &m_Edep_byPosAndParticle;   };
+  std::map<G4String,std::map<G4String,std::map<G4ThreeVector,G4float> > >* GetEobsByPosAndParticleMap()   { return &m_Eobs_byPosAndParticle;   };
+  std::map<G4String,std::map<G4String,std::map<G4ThreeVector,G4float> > >* GetNCerenByPosAndParticleMap() { return &m_NCeren_byPosAndParticle; };
+  std::map<G4String,std::map<G4String,std::map<G4ThreeVector,G4float> > >* GetEdepByPosAndParticleTypeMap()   { return &m_Edep_byPosAndParticleType;   };
+  std::map<G4String,std::map<G4String,std::map<G4ThreeVector,G4float> > >* GetEobsByPosAndParticleTypeMap()   { return &m_Eobs_byPosAndParticleType;   };
+  std::map<G4String,std::map<G4String,std::map<G4ThreeVector,G4float> > >* GetNCerenByPosAndParticleTypeMap() { return &m_NCeren_byPosAndParticleType; };
+  
+  std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > > >* GetEdepByPosAndParticleAndTimeMap()   { return &m_Edep_byPosAndParticleAndTime;   };
+  std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > > >* GetEobsByPosAndParticleAndTimeMap()   { return &m_Eobs_byPosAndParticleAndTime;   };
+  std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > > >* GetNCerenByPosAndParticleAndTimeMap() { return &m_NCeren_byPosAndParticleAndTime; };
+  std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > > >* GetEdepByPosAndParticleTypeAndTimeMap()   { return &m_Edep_byPosAndParticleTypeAndTime;   };
+  std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > > >* GetEobsByPosAndParticleTypeAndTimeMap()   { return &m_Eobs_byPosAndParticleTypeAndTime;   };
+  std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > > >* GetNCerenByPosAndParticleTypeAndTimeMap() { return &m_NCeren_byPosAndParticleTypeAndTime; };
   
   
   std::map<G4String,std::map<G4String,G4int> >* GetParticleMult() { return &m_particleMult; };

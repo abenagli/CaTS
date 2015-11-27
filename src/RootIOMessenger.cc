@@ -42,6 +42,12 @@ RootIOMessenger::RootIOMessenger(RootIO* pR):
   pBranchStatus2Cmd->SetParameterName("status", false);
   pBranchStatus2Cmd->SetDefaultValue(1);
   pBranchStatus2Cmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+  
+  pBranchStatus3Cmd = new G4UIcmdWithAnInteger("/CaTS/RootIO/EdepBranches", this);
+  pBranchStatus3Cmd->SetGuidance("activate / deactivate branches of Edep");
+  pBranchStatus3Cmd->SetParameterName("status", false);
+  pBranchStatus3Cmd->SetDefaultValue(1);
+  pBranchStatus3Cmd->AvailableForStates(G4State_PreInit, G4State_Idle);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -74,6 +80,19 @@ void RootIOMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
   }
   if( command == pBranchStatus2Cmd ){
     pRootIO -> SetBranchStatus("HCMap",pBranchStatus1Cmd->GetNewIntValue(newValue));
+  }
+  if( command == pBranchStatus3Cmd ){
+    pRootIO -> SetBranchStatus("m_Edep_byTime",pBranchStatus3Cmd->GetNewIntValue(newValue));
+    pRootIO -> SetBranchStatus("m_Edep_byPos",pBranchStatus3Cmd->GetNewIntValue(newValue));
+    pRootIO -> SetBranchStatus("m_Edep_byPosAndTime",pBranchStatus3Cmd->GetNewIntValue(newValue));
+    pRootIO -> SetBranchStatus("m_Edep_byParticle",pBranchStatus3Cmd->GetNewIntValue(newValue));
+    pRootIO -> SetBranchStatus("m_Edep_byParticleType",pBranchStatus3Cmd->GetNewIntValue(newValue));
+    pRootIO -> SetBranchStatus("m_Edep_byParticleAndTime",pBranchStatus3Cmd->GetNewIntValue(newValue));
+    pRootIO -> SetBranchStatus("m_Edep_byParticleTypeAndTime",pBranchStatus3Cmd->GetNewIntValue(newValue));
+    pRootIO -> SetBranchStatus("m_Edep_byPosAndParticle",pBranchStatus3Cmd->GetNewIntValue(newValue));
+    pRootIO -> SetBranchStatus("m_Edep_byPosAndParticleType",pBranchStatus3Cmd->GetNewIntValue(newValue));
+    pRootIO -> SetBranchStatus("m_Edep_byPosAndParticleAndTime",pBranchStatus3Cmd->GetNewIntValue(newValue));
+    pRootIO -> SetBranchStatus("m_Edep_byPosAndParticleTypeAndTime",pBranchStatus3Cmd->GetNewIntValue(newValue));
   }
 }
 

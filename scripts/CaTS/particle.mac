@@ -1,10 +1,10 @@
-/CaTS/random/randomSeed 123456
+/CaTS/random/randomSeed JOB
 /CaTS/random/saveSeed false
-/CaTS/RootIO/Filename pi-_50GeV_hits.root
+/CaTS/RootIO/Filename PARTICLE_ENERGYGeV_hits_JOB.root
 /CaTS/RootIO/MapByPosBranch 1
 /CaTS/RootIO/HCMapBranch 0
 /CaTS/RootIO/EdepBranches 0
-/CaTS/Analysis/Filename pi-_50GeV_analysis.root
+/CaTS/Analysis/Filename PARTICLE_ENERGYGeV_analysis_JOB.root
 # low time slices
 /CaTS/RunAction/TimeSliceSizeLow 0.010 ns
 /CaTS/RunAction/MinTimeLow 0. ns
@@ -21,7 +21,7 @@
 #/tracking/verbose 1
 /gun/direction 0. 0. 1.
 /gun/position 0. 0. 0. mm
-/gun/particle pi-
-/gun/energy 50 GeV
-/run/beamOn 10
+/gun/particle PARTICLE
+/gun/energy ENERGY GeV
+/run/beamOn NEVTS
 exit

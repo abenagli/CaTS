@@ -45,6 +45,7 @@ private:
   G4UIcmdWithAString* pFilenameCmd;
   G4UIcmdWithAnInteger* pBranchStatus1Cmd;
   G4UIcmdWithAnInteger* pBranchStatus2Cmd;
+  G4UIcmdWithAnInteger* pBranchStatus3Cmd;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -1,0 +1,44 @@
+#######################################################
+# label        part.    E(GeV)   Nevts   Njobs   Nfirst
+#######################################################
+#e-_3GeV          e-         3     2500       1        0
+#pi-_3GeV        pi-         3     1250       2        0
+#proton_3GeV  proton         3     1250       2        0
+##
+#e-_10GeV          e-        10     500       5        0
+#pi-_10GeV        pi-        10     250      10        0
+#proton_10GeV  proton        10     250      10        0
+##
+#e-_30GeV          e-        30     250      10        0
+#pi-_30GeV        pi-        30     100      25        0
+#proton_30GeV  proton        30     100      25        0
+##
+e-_50GeV          e-        50     250      10        0
+pi-_50GeV        pi-        50     100      25        0
+proton_50GeV  proton        50     100      25        0
+##
+#e-_100GeV         e-       100     100      25        0
+#pi-_100GeV       pi-       100      50      50        0
+#proton_100GeV proton       100      50      50        0
+##
+#e-_300GeV         e-       300      25     100        0
+#pi-_300GeV       pi-       300      25     100        0
+#proton_300GeV proton       300      25     100        0
+##
+##
+##
+##e-_10GeV          e-        10     250       1        0
+##pi-_10GeV        pi-        10     250       1        0
+##proton_10GeV  proton        10     250       1        0
+###
+##e-_30GeV          e-        30     250       1        0
+##pi-_30GeV        pi-        30     250       1        0
+##proton_30GeV  proton        30     250       1        0
+###
+##e-_50GeV          e-        50     250       1        0
+##pi-_50GeV        pi-        50     125       2        0
+##proton_50GeV  proton        50     125       2        0
+###
+##e-_100GeV         e-       100     250       1        0
+##pi-_100GeV       pi-       100     125       2        0
+##proton_100GeV proton       100     125       2        0

@@ -42,13 +42,16 @@ std::vector<G4float> vf;
 std::map<G4String,G4float> sfMap;
 // energy by detector and time
 std::map<G4int,G4float> ifMap;
+std::map<G4String,std::map<G4int,G4float> > sifMap;
+std::map<G4String,std::map<G4String,std::map<G4int,G4float> > > ssifMap;
+
+// energy by detector and position
 std::map<G4ThreeVector,G4float> vfMap;
+std::map<G4String,std::map<G4ThreeVector,G4float> > svfMap;
+// energy by detector and position and time
 std::map<G4int,std::map<G4ThreeVector,G4float> > ivfMap;
 std::map<G4String,std::map<G4int,std::map<G4ThreeVector,G4float> > > sivfMap;
 std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4ThreeVector,G4float> > > > ssivfMap;
-std::map<G4String,std::map<G4ThreeVector,G4float> > svfMap;
-std::map<G4String,std::map<G4int,G4float> > sifMap;
-std::map<G4String,std::map<G4String,std::map<G4int,G4float> > > ssifMap;
 
 // energy by detector and particle
 std::map<G4String,std::map<G4String,G4float> > ssfMap;
@@ -56,6 +59,13 @@ std::map<G4String,std::map<G4String,G4float> > ssfMap;
 std::map<G4int,std::map<G4String,G4float> > isfMap;
 std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > sisfMap;
 std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,G4float> > > > ssisfMap;
+
+// energy by detector and position and particle
+std::map<G4String,std::map<G4String,std::map<G4ThreeVector,G4float> > > ssvfMap;
+// energy by detector and position and particle and time
+std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > isvfMap;
+std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > > sisvfMap;
+std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > > > ssisvfMap;
 
 // particle multiplicity
 std::map<G4String,TH1F*> shMap;

@@ -337,7 +337,6 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
     (*m_Eobs_byParticle)[SensitiveDetectorName][particleName] += eobs;
     (*m_NCeren_byParticle)[SensitiveDetectorName][particleName] += G4float(NCerenPhotons);
     
-    
     //----------------------------------------------
     // event energy per sub-volume and particle type
     
@@ -347,6 +346,27 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
     (*m_Edep_byParticleType)[SensitiveDetectorName][particleType] += edep;
     (*m_Eobs_byParticleType)[SensitiveDetectorName][particleType] += eobs;
     (*m_NCeren_byParticleType)[SensitiveDetectorName][particleType] += G4float(NCerenPhotons);
+    
+    
+    //------------------------------------------------------
+    // event energy per sub-volume and position and particle
+    
+    std::map<G4String,std::map<G4String,std::map<G4ThreeVector,G4float> > >* m_Edep_byPosAndParticle = CaTSEvt->GetEdepByPosAndParticleMap();
+    std::map<G4String,std::map<G4String,std::map<G4ThreeVector,G4float> > >* m_Eobs_byPosAndParticle = CaTSEvt->GetEobsByPosAndParticleMap();
+    std::map<G4String,std::map<G4String,std::map<G4ThreeVector,G4float> > >* m_NCeren_byPosAndParticle = CaTSEvt->GetNCerenByPosAndParticleMap();
+    (*m_Edep_byPosAndParticle)[SensitiveDetectorName][particleName][cellPosition] += edep;
+    (*m_Eobs_byPosAndParticle)[SensitiveDetectorName][particleName][cellPosition] += eobs;
+    (*m_NCeren_byPosAndParticle)[SensitiveDetectorName][particleName][cellPosition] += NCerenPhotons;
+    
+    //------------------------------------------------------
+    // event energy per sub-volume and position and particle
+    
+    std::map<G4String,std::map<G4String,std::map<G4ThreeVector,G4float> > >* m_Edep_byPosAndParticleType = CaTSEvt->GetEdepByPosAndParticleTypeMap();
+    std::map<G4String,std::map<G4String,std::map<G4ThreeVector,G4float> > >* m_Eobs_byPosAndParticleType = CaTSEvt->GetEobsByPosAndParticleTypeMap();
+    std::map<G4String,std::map<G4String,std::map<G4ThreeVector,G4float> > >* m_NCeren_byPosAndParticleType = CaTSEvt->GetNCerenByPosAndParticleTypeMap();
+    (*m_Edep_byPosAndParticleType)[SensitiveDetectorName][particleType][cellPosition] += edep;
+    (*m_Eobs_byPosAndParticleType)[SensitiveDetectorName][particleType][cellPosition] += eobs;
+    (*m_NCeren_byPosAndParticleType)[SensitiveDetectorName][particleType][cellPosition] += NCerenPhotons;
   }
   
   
@@ -506,6 +526,27 @@ G4bool DRTSCalorimeterSD::ProcessHits(G4Step* aStep, G4TouchableHistory*)
         (*m_Edep_byParticleTypeAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][particleType] += edep;
         (*m_Eobs_byParticleTypeAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][particleType] += eobs;
         (*m_NCeren_byParticleTypeAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][particleType] += G4float(NCerenPhotons);
+        
+        
+        //------------------------------------------------------
+        // event energy per sub-volume and position and particle
+        
+        std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > > >* m_Edep_byPosAndParticleAndTime = CaTSEvt->GetEdepByPosAndParticleAndTimeMap();
+        std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > > >* m_Eobs_byPosAndParticleAndTime = CaTSEvt->GetEobsByPosAndParticleAndTimeMap();
+        std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > > >* m_NCeren_byPosAndParticleAndTime = CaTSEvt->GetNCerenByPosAndParticleAndTimeMap();
+        (*m_Edep_byPosAndParticleAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][particleName][cellPosition] += edep;
+        (*m_Eobs_byPosAndParticleAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][particleName][cellPosition] += eobs;
+        (*m_NCeren_byPosAndParticleAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][particleName][cellPosition] += NCerenPhotons;
+        
+        //-----------------------------------------------------------
+        // event energy per sub-volume and position and particle type
+        
+        std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > > >* m_Edep_byPosAndParticleTypeAndTime = CaTSEvt->GetEdepByPosAndParticleTypeAndTimeMap();
+        std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > > >* m_Eobs_byPosAndParticleTypeAndTime = CaTSEvt->GetEobsByPosAndParticleTypeAndTimeMap();
+        std::map<G4String,std::map<G4String,std::map<G4int,std::map<G4String,std::map<G4ThreeVector,G4float> > > > >* m_NCeren_byPosAndParticleTypeAndTime = CaTSEvt->GetNCerenByPosAndParticleTypeAndTimeMap();
+        (*m_Edep_byPosAndParticleTypeAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][particleType][cellPosition] += edep;
+        (*m_Eobs_byPosAndParticleTypeAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][particleType][cellPosition] += eobs;
+        (*m_NCeren_byPosAndParticleTypeAndTime)[SensitiveDetectorName][timeSliceName][timeSlice][particleType][cellPosition] += NCerenPhotons;
       }
       
       

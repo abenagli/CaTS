@@ -72,6 +72,21 @@ void Event::Reset()
   m_NCeren_byParticleTypeAndTime.clear();
   
   
+  m_Edep_byPosAndParticle.clear();
+  m_Eobs_byPosAndParticle.clear();
+  m_NCeren_byPosAndParticle.clear();
+  m_Edep_byPosAndParticleType.clear();
+  m_Eobs_byPosAndParticleType.clear();
+  m_NCeren_byPosAndParticleType.clear();
+  
+  m_Edep_byPosAndParticleAndTime.clear();
+  m_Eobs_byPosAndParticleAndTime.clear();
+  m_NCeren_byPosAndParticleAndTime.clear();
+  m_Edep_byPosAndParticleTypeAndTime.clear();
+  m_Eobs_byPosAndParticleTypeAndTime.clear();
+  m_NCeren_byPosAndParticleTypeAndTime.clear();
+  
+  
   m_particleMult.clear();
   
   m_particleAndTimeMult.clear();
