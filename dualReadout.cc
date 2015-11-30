@@ -23,12 +23,11 @@
 #include "TKey.h"
 #include "TH1.h"
 #include "TH2.h"
-#include "TProfile2D.h"
-#include "TBranch.h"
-#include "TBranchElement.h"
 #include "TProfile.h"
 #include "TProfile2D.h"
 #include "TH1D.h"
+#include "TBranch.h"
+#include "TBranchElement.h"
 //
 #include "Cintex/Cintex.h"
 //
@@ -156,7 +155,8 @@ int main(int argc, char** argv)
     Tevt -> SetBranchStatus("m_Edep",1);
     Tevt -> SetBranchStatus("m_Eobs",1);
     Tevt -> SetBranchStatus("m_NCeren",1);
-    Tevt -> SetBranchStatus("m_Edep_byTime",1);
+    Tevt -> SetBranchStatus("m_Eobs_byTime",1);
+    Tevt -> SetBranchStatus("m_Eobs_byPos",1);
     
     RunHeader* runHeader = new RunHeader();
     TBranch* b_runHeader = Trh -> GetBranch("RunHeader");
@@ -178,11 +178,12 @@ int main(int argc, char** argv)
     
     std::map<G4String,TDirectory*> VolumeDirsetGlobal;
     std::map<G4String,TDirectory*> VolumeDirsetTime;
+    std::map<G4String,TDirectory*> VolumeDirsetPos;
     
     std::vector<G4String>* volumeList;
     
     std::vector<G4String> timeTypes;
-    timeTypes.push_back("globalTime");
+    //timeTypes.push_back("globalTime");
     timeTypes.push_back("localTime1");
     //timeTypes.push_back("localTime2");
     
@@ -210,6 +211,20 @@ int main(int argc, char** argv)
     intTimeVals.push_back(4.000); // 4.00 ns
     intTimeVals.push_back(4.500); // 4.50 ns
     
+    std::vector<G4float> intRadVals;
+    intRadVals.push_back( 25.); //  25 mm
+    intRadVals.push_back( 45.); //  45 mm
+    intRadVals.push_back( 65.); //  65 mm
+    intRadVals.push_back( 85.); //  85 mm
+    intRadVals.push_back(105.); // 105 mm
+    intRadVals.push_back(145.); // 145 mm
+    intRadVals.push_back(185.); // 185 mm
+    intRadVals.push_back(225.); // 225 mm
+    intRadVals.push_back(275.); // 275 mm
+    intRadVals.push_back(375.); // 375 mm
+    intRadVals.push_back(500.); // 500 mm
+
+    
     
     
     // define histograms
@@ -233,7 +248,11 @@ int main(int argc, char** argv)
     
     std::map<G4String,std::map<int,TF1*> > f_EobsMaxTime_vs_NCerenCalib;
     std::map<G4String,std::map<G4String,std::map<int,std::map<G4float,TF1*> > > > f_EobsMaxTime_vs_EobsIntTime;
+    std::map<G4String,std::map<G4float,TH2F*> > h2_EobsMaxRad_vs_EobsIntRad; // map<volume,map<radVal,TH2F*> >
+    std::map<G4String,std::map<G4float,TProfile*> > p_EobsMaxRad_vs_EobsIntRad; // map<volume,map<radVal,TProfile*> >
     
+    std::map<G4String,TProfile*> p_Eobs_vs_z;
+    std::map<G4String,TProfile2D*> p2_Eobs_vs_y_vs_x;
     
     // initialize histograms    
     
@@ -329,6 +348,35 @@ int main(int argc, char** argv)
       }
     }
     
+    TDirectory* posDir = outFile->mkdir("positionHistos");
+    posDir->cd();
+
+    for(unsigned int volIt = 0; volIt < volumeList->size(); ++volIt)
+    {
+      std::string volName = volumeList->at(volIt);
+      
+      // create the subdirectories for all the different SD (overkill): 
+      if (VolumeDirsetPos.find(volName) == VolumeDirsetPos.end())
+      {
+        VolumeDirsetPos.insert(std::make_pair(volName,posDir->mkdir(volName.c_str())));
+      }
+      
+      VolumeDirsetPos[volName]->cd();
+      
+      p_Eobs_vs_z[volName] = new TProfile(Form("p_Eobs%s_vs_z",volName.c_str()),"",3000,0.,3000);
+      p2_Eobs_vs_y_vs_x[volName] = new TProfile2D(Form("p2_Eobs%s_vs_y_vs_x",volName.c_str()),"",100,-500.,500.,100,-500.,500.);
+      
+      for(unsigned int intRadIt = 0; intRadIt < intRadVals.size(); ++intRadIt)
+      {
+        G4float intRad = intRadVals.at(intRadIt);
+        G4String name = Form("intRad%s_%03.0fmm",volName.c_str(),intRad);
+        
+        h2_EobsMaxRad_vs_EobsIntRad[volName][intRad] = new TH2F(Form("h2_%s",name.c_str()),"",1000,0.,1.,1000,0.,1.);
+        p_EobsMaxRad_vs_EobsIntRad[volName][intRad] = new TProfile(Form("p_%s",name.c_str()),"",1000,0.,1.);
+      }
+    }    
+    
+    
     
     //-----------------
     // loop over events
@@ -355,8 +403,8 @@ int main(int argc, char** argv)
         std::map<G4String,G4float>* m_Edep   = event->GetEdepMap();   // map<Detector,energy>
         std::map<G4String,G4float>* m_Eobs   = event->GetEobsMap();   // map<Detector,energy>
         std::map<G4String,G4float>* m_NCeren = event->GetNCerenMap(); // map<Detector,energy>
-        std::map<G4String,std::map<G4String,std::map<G4int,G4float> > >* m_Edep_byTime = event->GetEdepByTimeMap();
-        
+        std::map<G4String,std::map<G4String,std::map<G4int,G4float> > >* m_Eobs_byTime = event->GetEobsByTimeMap();
+        std::map<G4String,std::map<G4ThreeVector,G4float> >* m_Eobs_byPos = event->GetEobsByPosMap();
         
         // ------------
         // global plots
@@ -389,45 +437,85 @@ int main(int argc, char** argv)
         
         
         //---------------------
-        // time dependent plots      
+        // time dependent plots
         
-         for(unsigned int volIt = 0; volIt < volumeList->size()-1; ++volIt)
-         {
-           G4String volName = volumeList->at(volIt);
+        for(unsigned int volIt = 0; volIt < volumeList->size()-1; ++volIt)
+        {
+          G4String volName = volumeList->at(volIt);
           
-           for(unsigned int timeTypeIt = 0; timeTypeIt < timeTypes.size(); ++timeTypeIt)
-           {
-             G4String timeType = timeTypes.at(timeTypeIt);
-             G4String timeSliceName = timeType + "Low";
+          for(unsigned int timeTypeIt = 0; timeTypeIt < timeTypes.size(); ++timeTypeIt)
+          {
+            G4String timeType = timeTypes.at(timeTypeIt);
+            G4String timeSliceName = timeType + "Low";
             
             
-             // sum Eobs
-             float EobsMaxTime = 0.;
-             std::map<float,float> EobsIntTime;
-             for(int bin = 1; bin <= nTimeSlices["Low"]+1; ++bin)
-             {
-               EobsMaxTime += (*m_Edep_byTime)[volName][timeSliceName][bin];
+            // sum Eobs
+            float EobsMaxTime = 0.;
+            std::map<float,float> EobsIntTime;
+            for(int bin = 1; bin <= nTimeSlices["Low"]+1; ++bin)
+            {
+              EobsMaxTime += (*m_Eobs_byTime)[volName][timeSliceName][bin];
               
-               for(unsigned int intTimeIt = 0; intTimeIt < intTimeVals.size(); ++intTimeIt)
-               {
-                 G4float intTime = intTimeVals.at(intTimeIt);
+              for(unsigned int intTimeIt = 0; intTimeIt < intTimeVals.size(); ++intTimeIt)
+              {
+                G4float intTime = intTimeVals.at(intTimeIt);
                 
-                 if( minTimes["Low"]+(bin-1)*timeSliceSizes["Low"] < intTime )
-                   EobsIntTime[intTime] += (*m_Edep_byTime)[volName][timeSliceName][bin];
-               }
-             }
+                if( minTimes["Low"]+(bin-1)*timeSliceSizes["Low"] < intTime )
+                  EobsIntTime[intTime] += (*m_Eobs_byTime)[volName][timeSliceName][bin];
+              }
+            }
             
             
-             // fill histo
-             for(unsigned int intTimeIt = 0; intTimeIt < intTimeVals.size(); ++intTimeIt)
-             {
-               G4float intTime = intTimeVals.at(intTimeIt);
+            // fill histo
+            for(unsigned int intTimeIt = 0; intTimeIt < intTimeVals.size(); ++intTimeIt)
+            {
+              G4float intTime = intTimeVals.at(intTimeIt);
               
-               h2_EobsMaxTime_vs_EobsIntTime[volName][timeSliceName][intTime] -> Fill( EobsIntTime[intTime]/EobsMaxTime,EobsMaxTime/Ein );
-               p_EobsMaxTime_vs_EobsIntTime[volName][timeSliceName][intTime] -> Fill( EobsIntTime[intTime]/EobsMaxTime,EobsMaxTime/Ein );
-             }
-           }
-         }
+              h2_EobsMaxTime_vs_EobsIntTime[volName][timeSliceName][intTime] -> Fill( EobsIntTime[intTime]/EobsMaxTime,EobsMaxTime/Ein );
+              p_EobsMaxTime_vs_EobsIntTime[volName][timeSliceName][intTime] -> Fill( EobsIntTime[intTime]/EobsMaxTime,EobsMaxTime/Ein );
+            }
+          }
+        }
+        
+        
+        //-------------------------
+        // position dependent plots
+        
+        for(unsigned int volIt = 0; volIt < volumeList->size()-1; ++volIt)
+        {
+          G4String volName = volumeList->at(volIt);
+          
+          // sum Eobs
+          float EobsMaxRad = 0.;
+          std::map<float,float> EobsIntRad;
+            
+          std::map<G4ThreeVector,G4float> tempMap = (*m_Eobs_byPos)[volName];
+          for(std::map<G4ThreeVector,G4float>::const_iterator mapIt = tempMap.begin(); mapIt != tempMap.end(); ++mapIt)
+          {
+            p_Eobs_vs_z[volName] -> Fill( mapIt->first.z(),mapIt->second );
+            p2_Eobs_vs_y_vs_x[volName] -> Fill( mapIt->first.x(),mapIt->first.y(),mapIt->second );            
+            
+            EobsMaxRad += mapIt -> second;
+              
+            for(unsigned int intRadIt = 0; intRadIt < intRadVals.size(); ++intRadIt)
+            {
+              G4float intRad = intRadVals.at(intRadIt);
+              
+              if( sqrt(mapIt->first.x()*mapIt->first.x()+mapIt->first.y()*mapIt->first.y()) < intRad )
+                EobsIntRad[intRad] += mapIt -> second;
+            }
+            
+            // fill histo
+            for(unsigned int intRadIt = 0; intRadIt < intRadVals.size(); ++intRadIt)
+            {
+              G4float intRad = intRadVals.at(intRadIt);
+              
+              h2_EobsMaxRad_vs_EobsIntRad[volName][intRad] -> Fill( EobsIntRad[intRad]/EobsMaxRad,EobsMaxRad/Ein );
+              p_EobsMaxRad_vs_EobsIntRad[volName][intRad] -> Fill( EobsIntRad[intRad]/EobsMaxRad,EobsMaxRad/Ein );
+            }
+          }
+        }
+        
         
       } // end loop over events
       std::cout << "\n>>> loop over events done" << std::endl;
@@ -493,7 +581,7 @@ int main(int argc, char** argv)
         std::map<G4String,G4float>* m_Edep   = event->GetEdepMap();   // map<Detector,energy>
         std::map<G4String,G4float>* m_Eobs   = event->GetEobsMap();   // map<Detector,energy>
         std::map<G4String,G4float>* m_NCeren = event->GetNCerenMap(); // map<Detector,energy>
-        std::map<G4String,std::map<G4String,std::map<G4int,G4float> > >* m_Edep_byTime = event->GetEdepByTimeMap();
+        std::map<G4String,std::map<G4String,std::map<G4int,G4float> > >* m_Eobs_byTime = event->GetEobsByTimeMap();
         
         
         // ------------
@@ -534,14 +622,14 @@ int main(int argc, char** argv)
             std::map<float,float> EobsIntTime;
             for(int bin = 1; bin <= nTimeSlices["Low"]+1; ++bin)
             {
-              EobsMaxTime += (*m_Edep_byTime)[volName][timeSliceName][bin];
+              EobsMaxTime += (*m_Eobs_byTime)[volName][timeSliceName][bin];
               
               for(unsigned int intTimeIt = 0; intTimeIt < intTimeVals.size(); ++intTimeIt)
               {
                 G4float intTime = intTimeVals.at(intTimeIt);
                 
                 if( minTimes["Low"]+(bin-1)*timeSliceSizes["Low"] < intTime )
-                  EobsIntTime[intTime] += (*m_Edep_byTime)[volName][timeSliceName][bin];
+                  EobsIntTime[intTime] += (*m_Eobs_byTime)[volName][timeSliceName][bin];
               }
             }
             
